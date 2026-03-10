@@ -1,10 +1,139 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>个人中心 - THE HAIDAO POST</title>
+    <style>
+        :root { --primary-red: #d32f2f; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fcfcfc; margin: 0; }
+        .header { text-align: center; padding: 40px; background: white; border-bottom: 1px solid #eaeaea; border-top: 6px solid var(--primary-red); }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+
+        /* 左侧：用户信息卡 */
+        .user-card { background: white; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center; height: fit-content; }
+        .avatar-wrapper { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; cursor: pointer; }
+        .avatar-large { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; transition: 0.3s; }
+        .avatar-wrapper:hover .avatar-large { filter: brightness(0.7); }
+        .avatar-wrapper::after { content: '更换头像'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; opacity: 0; transition: 0.3s; }
+        .avatar-wrapper:hover::after { opacity: 1; }
+
+        .nickname-display { font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .edit-icon { cursor: pointer; font-size: 16px; color: #999; }
+        .edit-input { width: 80%; padding: 5px; text-align: center; font-size: 20px; border: 1px solid #ddd; display: none; }
+
+        /* 右侧：内容区切换 */
+        .content-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .tab-item { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #888; }
+        .tab-item.active { color: var(--primary-red); border-bottom: 2px solid var(--primary-red); margin-bottom: -2px; }
+
+        .report-item { background: white; padding: 20px; border-radius: 4px; border: 1px solid #f0f0f0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-delete { color: var(--primary-red); cursor: pointer; font-size: 13px; }
+    </style>
 </head>
 <body>
 
+<header class="header">
+    <h1 style="font-family: 'Georgia', serif; cursor:pointer;" onclick="window.location.href='index.html'">THE HAIDAO POST</h1>
+</header>
+
+<div class="container">
+    <aside class="user-card">
+        <div class="avatar-wrapper" onclick="document.getElementById('avatar-upload').click()">
+            <img src="" id="display-avatar" class="avatar-large">
+            <input type="file" id="avatar-upload" style="display:none" onchange="uploadAvatar(this)">
+        </div>
+
+        <div class="nickname-area">
+            <div class="nickname-display" id="name-box">
+                <span id="text-username">载入中...</span>
+                <span class="edit-icon" onclick="toggleEdit()">✎</span>
+            </div>
+            <input type="text" id="input-username" class="edit-input" onblur="saveNickname()">
+        </div>
+        <p style="color:#999; font-size:12px;">首席观察员 • Alpha 级权限</p>
+    </aside>
+
+    <main>
+        <div class="content-tabs">
+            <div class="tab-item active" onclick="switchTab('reports')">我的档案</div>
+            <div class="tab-item" onclick="switchTab('messages')">机密私信</div>
+        </div>
+
+        <div id="reports-section" class="section">
+            <div id="my-posts-list"></div>
+        </div>
+
+        <div id="messages-section" class="section" style="display:none">
+            <p style="text-align:center; color:#999; margin-top:50px;">正在加密通讯频道... (私信功能开发中)</p>
+        </div>
+    </main>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+
+    // 初始化数据
+    document.addEventListener('DOMContentLoaded', () => {
+        fetch('http://localhost:8080/user/info', { headers: { 'Authorization': token } })
+        .then(res => res.json())
+        .then(data => {
+            if(data.code === 200) {
+                updateUI(data.data);
+                loadMyPosts();
+            }
+        });
+    });
+
+    function updateUI(user) {
+        document.getElementById('text-username').innerText = user.username;
+        document.getElementById('input-username').value = user.username;
+        document.getElementById('display-avatar').src = user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
+    }
+
+    // 修改昵称逻辑
+    function toggleEdit() {
+        document.getElementById('name-box').style.display = 'none';
+        const input = document.getElementById('input-username');
+        input.style.display = 'inline-block';
+        input.focus();
+    }
+
+     function saveNickname() {
+        const newName = document.getElementById('input-username').value;
+        const token = localStorage.getItem('token');
+
+        // 🚨 这里的键名必须改写为 nickName，对接你的后端字段 🚨
+        fetch('http://localhost:8080/user/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': token },
+            body: JSON.stringify({ nickName: newName }) // 改成你的后端字段名
+        }).then(res => res.json()).then(data => {
+            if(data.code === 200) {
+                document.getElementById('text-username').innerText = newName;
+                alert("代号修改成功，已记入档案！");
+            } else {
+                alert("修改失败：" + data.msg);
+            }
+            document.getElementById('name-box').style.display = 'flex';
+            document.getElementById('input-username').style.display = 'none';
+        });
+    }
+
+    // 上传头像逻辑
+    function uploadAvatar(input) {
+        if (!input.files || !input.files[0]) return;
+
+        // 🚨 这里是简化版：实际你应该把文件发给后端 🚨
+        // 目前为了测试，我们假设后端接受一个图片的 Base64 或者 URL
+        alert("正在准备上传模块...（此处需配合后端的 MultipartFile 接口）");
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab-item[onclick*="${tab}"]`).classList.add('active');
+        document.getElementById('reports-section').style.display = tab === 'reports' ? 'block' : 'none';
+        document.getElementById('messages-section').style.display = tab === 'messages' ? 'block' : 'none';
+    }
+</script>
 </body>
 </html>

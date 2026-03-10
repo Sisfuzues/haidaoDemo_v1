@@ -1,10 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>起草观察报告 - THE HAIDAO POST</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <style>
+        :root { --primary-red: #d32f2f; --bg-gray: #f9f9f9; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg-gray); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+
+        /* 🚨 核心改动：主背景保持白色，但内容区域居中且限宽 🚨 */
+        .editor-main { flex: 1; background: white; padding: 30px 0; display: flex; flex-direction: column; overflow-y: auto; }
+
+        .write-focus-wrapper {
+            width: 90%;
+            max-width: 950px; /* 🚨 这里限制了宽度，不再是满屏 🚨 */
+            margin: 0 auto;  /* 🚨 居中对齐 🚨 */
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .title-input {
+            width: 100%; border: none; font-size: 32px; font-family: 'Georgia', serif;
+            font-weight: bold; margin-bottom: 20px; outline: none; color: #111;
+        }
+
+        /* 编辑器内部样式优化 */
+        .EasyMDEContainer { flex: 1; display: flex; flex-direction: column; }
+        .CodeMirror { flex: 1; font-size: 16px; border: 1px solid #eee !important; border-radius: 4px; line-height: 1.6; }
+        .editor-toolbar { border: none !important; opacity: 0.8; transition: opacity 0.3s; }
+        .editor-toolbar:hover { opacity: 1; }
+        .editor-preview-side { background: #fafafa; font-family: 'Georgia', serif; padding: 20px; }
+
+        .editor-sidebar { width: 280px; background: white; border-left: 1px solid #eee; padding: 40px 20px; display: flex; flex-direction: column; gap: 25px; }
+        .sidebar-title { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .setting-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
+        .setting-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: var(--bg-gray); }
+        .publish-btn { background: var(--primary-red); color: white; border: none; padding: 14px; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .publish-btn:hover { background: #b71c1c; transform: translateY(-2px); }
+    </style>
 </head>
 <body>
 
+<div class="editor-main">
+    <div class="write-focus-wrapper">
+        <div style="margin-bottom: 15px;"><a href="index.html" style="color:#888; text-decoration:none; font-size:13px;">← 返回指挥部</a></div>
+        <input type="text" id="post-title" class="title-input" placeholder="输入报告标题...">
+        <textarea id="post-content"></textarea>
+    </div>
+</div>
+
+<div class="editor-sidebar">
+    <div class="sidebar-title">报告配置</div>
+    <div class="setting-group">
+        <label>分类 (Category)</label>
+        <select id="post-category">
+            <option value="Economics">经济观察</option>
+            <option value="Politics">政治分析</option>
+            <option value="International">国际事务</option>
+        </select>
+    </div>
+    <button class="publish-btn" onclick="submitPost()">发布报告</button>
+</div>
+
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('post-content'),
+        autoDownloadFontAwesome: true,
+        spellChecker: false,
+        placeholder: "在此输入内容，支持 Markdown...",
+        toolbar: [
+            "bold", "italic", "heading", "|",
+            "quote", "unordered-list", "ordered-list", "|",
+            "link", "image", "|",
+            "side-by-side", "fullscreen", "|", "guide"
+        ]
+    });
+
+    // 自动开启分屏预览，让你一进来就享受 Obsidian 般的快感
+    setTimeout(() => { easyMDE.toggleSideBySide(); }, 200);
+
+    function submitPost() {
+        const title = document.getElementById('post-title').value;
+        const content = easyMDE.value();
+        const category = document.getElementById('post-category').value;
+        const token = localStorage.getItem('token');
+
+        if (!title || !content) return alert("内容不能为空喵！");
+
+        fetch('http://localhost:8080/post', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': token },
+            body: JSON.stringify({ title, content, category })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.code === 200) { alert('报告已存档！'); window.location.href = 'index.html'; }
+        });
+    }
+</script>
 </body>
 </html>

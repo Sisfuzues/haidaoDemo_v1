@@ -1,10 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>海岛观察站 - 注册</title>
+  <style>
+    /* 与登录页完全一致的极简灰白背景和卡片阴影 */
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f7f8fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .auth-card {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        width: 320px;
+        text-align: center;
+        /* 品牌标志性的红线 */
+        border-top: 4px solid #d32f2f;
+    }
+    .brand-title {
+        font-family: 'Georgia', serif;
+        color: #111;
+        margin-bottom: 5px;
+        font-size: 24px;
+    }
+    .brand-subtitle {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .input-group { margin-bottom: 15px; }
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        border: 1px solid #eaeaea;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fafafa;
+        transition: all 0.3s ease;
+    }
+    input:focus {
+        border-color: #d32f2f;
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #d32f2f;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-family: 'Georgia', serif;
+        margin-top: 10px;
+    }
+    button:hover { background: #b71c1c; }
+    .footer-links { margin-top: 25px; font-size: 13px; }
+    .footer-links a { color: #666; text-decoration: none; transition: color 0.3s; }
+    .footer-links a:hover { color: #d32f2f; }
+  </style>
 </head>
 <body>
 
+<div class="auth-card">
+  <h2 class="brand-title">THE HAIDAO POST</h2>
+  <div class="brand-subtitle">Observer Registration</div>
+
+  <div class="input-group">
+    <input type="text" id="username" placeholder="设置用户名 / Username">
+  </div>
+  <div class="input-group">
+    <input type="password" id="password" placeholder="设置密码 / Password">
+  </div>
+  <div class="input-group">
+    <input type="password" id="password-confirm" placeholder="确认密码 / Confirm Password">
+  </div>
+
+  <button onclick="doRegister()">提交注册申请</button>
+
+  <div class="footer-links">
+    <p><a href="login.html">已有帐号？去登录 (Login)</a></p>
+  </div>
+</div>
+
+<script>
+  function doRegister() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      const passConfirm = document.getElementById('password-confirm').value;
+
+      // 前端基础拦截：防呆设计
+      if (!user || !pass) {
+          alert("代号和暗号不能为空！");
+          return;
+      }
+      if (pass !== passConfirm) {
+          alert("两次输入的暗号不一致，请重新检查！");
+          return;
+      }
+
+      // 数据打包发射，直击你的 UserController
+      fetch('http://localhost:8080/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+      })
+      .then(res => res.json())
+      .then(data => {
+          if(data.code === 200) {
+              alert('登记成功！欢迎加入海岛，请前往验证身份。');
+              window.location.href = 'login.html'; // 成功后顺滑跳往登录页
+          } else {
+              alert('登记受阻：' + data.msg);
+          }
+      })
+      .catch(err => {
+          console.error("网络异常", err);
+          alert('通讯中断，请检查后端服务是否启动！');
+      });
+  }
+</script>
 </body>
 </html>

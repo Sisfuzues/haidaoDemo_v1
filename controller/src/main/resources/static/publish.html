@@ -1,10 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>海岛观察站 - 发布情报</title>
+    <style>
+        body { font-family: sans-serif; background: #eceff1; padding: 50px; }
+        .container { background: white; padding: 30px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        input, textarea { width: 95%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #c82333; }
+        .token-info { font-size: 12px; color: gray; word-break: break-all; margin-bottom: 20px; }
+    </style>
 </head>
 <body>
+<div class="container">
+    <h2>📡 发布最新观察情报</h2>
 
+    <div class="token-info" id="tokenDisplay">正在检查通行证...</div>
+
+    <input type="text" id="title" placeholder="情报标题">
+    <textarea id="content" rows="6" placeholder="情报正文内容..."></textarea>
+    <button onclick="doPublish()">发射情报</button>
+    <button onclick="logout()" style="background: #6c757d; margin-left: 10px;">销毁证件退出</button>
+</div>
+
+<script>
+    // 页面一加载，先去保险柜里拿 Token
+    const token = localStorage.getItem('haidao_token');
+
+    if(!token) {
+        alert('你没有通行证，请先登录！');
+        window.location.href = 'login.html';
+    } else {
+        document.getElementById('tokenDisplay').innerText = "当前持有通行证: " + token.substring(0, 30) + "...";
+    }
+
+    function doPublish() {
+        // 战友，把这里的 URL 换成你实际的发帖接口路径！
+        const targetUrl = 'http://localhost:8080/post/add';
+
+        const postTitle = document.getElementById('title').value;
+        const postContent = document.getElementById('content').value;
+
+        fetch(targetUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // 【核心突防动作】把 Token 挂在请求头上过安检！
+                'Authorization': token
+            },
+            body: JSON.stringify({ title: postTitle, content: postContent })
+        })
+        .then(res => {
+            // 如果拦截器拦截了，会返回 401
+            if(res.status === 401) {
+                throw new Error("通行证假冒或已过期，被哨兵拦截！");
+            }
+            return res.json();
+        })
+        .then(data => {
+            alert('情报发射成功！后端返回: ' + JSON.stringify(data));
+        })
+        .catch(error => {
+            alert(error.message);
+            window.location.href = 'login.html'; // 赶回登录页
+        });
+    }
+
+    function logout() {
+        localStorage.removeItem('haidao_token'); // 撕毁证件
+        window.location.href = 'login.html';
+    }
+</script>
 </body>
 </html>

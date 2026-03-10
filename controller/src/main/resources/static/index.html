@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>THE HAIDAO POST</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fcfcfc;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px 20px;
+            background: white;
+            border-bottom: 1px solid #eaeaea;
+            position: relative;
+            /* 咱们的灵魂红边 */
+            border-top: 6px solid #d32f2f;
+        }
+        .header h1 {
+            font-family: 'Georgia', serif;
+            font-size: 36px;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
+            color: #111;
+        }
+        .header p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+    /* 🚨 升级版：右上角操作区布局 🚨 */
+        .header-actions {
+            position: absolute;
+            right: 40px;
+            top: 35px; /* 稍微上调一点，给头像留空间 */
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        /* 个人中心跳转链接容器 */
+        .user-profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .user-profile-link:hover {
+            background: #f5f5f5; /* 鼠标悬浮时给个淡淡的背景反馈 */
+        }
+        /* 头像样式 */
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%; /* 变成正圆形 */
+            border: 1px solid #eaeaea;
+            object-fit: cover;
+            background-color: #fff;
+        }
+        /* 文字信息 */
+        .user-info {
+            font-size: 14px;
+            color: #555;
+            font-family: 'Georgia', serif;
+            margin: 0;
+        }
+        .user-info span {
+            font-weight: bold;
+            color: #111;
+        }
+
+
+        .write-btn {
+            background: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .write-btn:hover { background: #b71c1c; }
+        /* 退出登录按钮 */
+        .logout-btn {
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        .article-card {
+            background: white;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        }
+        .article-meta {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .article-title {
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            margin: 0 0 15px 0;
+            color: #111;
+        }
+        .article-excerpt {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #555;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <h1>THE HAIDAO POST</h1>
+    <p>Economics, Politics & International Affairs</p>
+
+    <div class="header-actions">
+        <a href="profile.html" class="user-profile-link" title="前往个人指挥中心">
+            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=default" id="current-avatar" class="user-avatar" alt="头像">
+            <p class="user-info">观察员：<span id="current-username">加载中...</span></p>
+        </a>
+
+        <span class="logout-btn" onclick="doLogout()">撤退</span>
+        <a href="write.html" class="write-btn">撰写新文章</a>
+    </div>
+</header>
+
+<div class="container" id="article-list">
+    <p style="text-align: center; color: #999;">正在连接数据中心，获取观察报告...</p>
+</div>
+
+<script>
+    // 页面一加载，就执行“查岗”和“拉取数据”
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 检查钱包里有没有 JWT 令牌
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('门卫拦截：未检测到通行证，请先验证身份！');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // 🚨 功能 2：获取账户信息 (需要后端提供 /user/info 接口) 🚨
+        // 注意：这里我在请求头里塞入了 JWT 令牌！
+        fetch('http://localhost:8080/user/info', {
+            method: 'GET',
+            headers: {
+                'Authorization': token  // 掏出令牌给后端门卫看
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+           if(data.code === 200) {
+              const username = data.data.username;
+              document.getElementById('current-username').innerText = username;
+
+              // 🚨 动态头像魔法：如果数据库里有头像字段(avatar)，就用真实的；
+              // 如果没有，我就用一个开源的像素头像 API，根据你的用户名自动生成一个独一无二的几何头像！
+              const avatarUrl = data.data.avatar ? data.data.avatar : `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`;
+              document.getElementById('current-avatar').src = avatarUrl;
+
+           } else {
+                // 如果令牌过期或造假，后端会报错
+                alert('身份过期，请重新验证！');
+                doLogout();
+            }
+        })
+        .catch(err => console.error("获取用户信息失败", err));
+
+
+        // 🚨 功能 1：获取所有文章列表 (需要后端提供 /article/list 接口) 🚨
+       // 🚨 功能 1：获取所有文章列表 (完美对接你的 PostController) 🚨
+      fetch('http://localhost:8080/post', {  // <--- 这里改成了你的 /post
+          method: 'GET',
+          headers: { 'Authorization': token }
+      })
+      .then(res => res.json())
+      .then(data => {
+          if(data.code === 200) {
+              renderPosts(data.data); // 拿到真实数据后，调用渲染函数
+          }
+      })
+      .catch(err => console.error("获取报告列表失败", err));
+  }); // DOMContentLoaded 结束括号
+
+  // 把后端传来的 Post 列表变成漂亮的 HTML 卡片
+  // 把后端传来的 Post 列表变成漂亮的 HTML 卡片
+    // 🚨 核心逻辑：把 Markdown 乱码洗成纯净文字 🚨
+  function stripMarkdown(text) {
+      if (!text) return "";
+      return text
+          .replace(/[#*`~_]/g, '')        // 剔除 #, *, `, ~, _ 这些符号
+          .replace(/\[.*?\]\(.*?\)/g, '') // 剔除 [链接](url)
+          .substring(0, 80) + "...";      // 摘要留 80 字就行，多了乱
+  }
+
+  function renderPosts(posts) {
+      const listContainer = document.getElementById('article-list');
+      listContainer.innerHTML = '';
+
+      posts.forEach(post => {
+          // 🚨 这里调用过滤器，把你的“# 元神牛逼”变成“元神牛逼” 🚨
+          const cleanExcerpt = stripMarkdown(post.content);
+
+          const articleHtml = `
+              <article class="article-card" onclick="viewPost(${post.id})">
+                  <div class="article-meta">OBSERVATION LOG • REPORT #${post.id}</div>
+                  <h2 class="article-title">${post.title || '无标题报告'}</h2>
+                  <p class="article-excerpt">${cleanExcerpt}</p>
+              </article>
+          `;
+          listContainer.innerHTML += articleHtml;
+      });
+  }
+
+  // 🚨 新增：跳转到阅读页，并在 URL 尾巴上带上文章的 ID
+  function viewPost(postId) {
+      window.location.href = `read.html?id=${postId}`;
+  }
+// 🚨 新增：把带 Markdown 的乱码变成纯净的文字摘要 🚨
+  function stripMarkdown(text) {
+      if (!text) return "";
+      return text
+          .replace(/[#*`~_]/g, '') // 剔除常见的 Markdown 符号
+          .replace(/\[.*?\]\(.*?\)/g, '') // 剔除链接
+          .substring(0, 100) + "..."; // 截取前100字
+  }
+    // 退出登录逻辑：撕毁令牌，滚回登录页
+    function doLogout() {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+    }
+</script>
+</body>
+</html>

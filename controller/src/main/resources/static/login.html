@@ -1,10 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <title>海岛观察站 - 身份验证</title>
+  <style>
+    /* 极简灰白背景，突出中央卡片 */
+    body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f7f8fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .auth-card {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        width: 320px;
+        text-align: center;
+        /* 顶部那一抹经典的红线 */
+        border-top: 4px solid #d32f2f;
+    }
+    .brand-title {
+        font-family: 'Georgia', serif; /* 经典的衬线报纸体 */
+        color: #111;
+        margin-bottom: 5px;
+        font-size: 24px;
+    }
+    .brand-subtitle {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .input-group { margin-bottom: 15px; }
+    input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        border: 1px solid #eaeaea;
+        border-radius: 4px;
+        font-size: 14px;
+        background: #fafafa;
+        transition: all 0.3s ease;
+    }
+    input:focus {
+        border-color: #d32f2f;
+        outline: none;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #d32f2f;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-family: 'Georgia', serif;
+        margin-top: 10px;
+    }
+    button:hover { background: #b71c1c; }
+    .footer-links { margin-top: 25px; font-size: 13px; }
+    .footer-links a { color: #666; text-decoration: none; transition: color 0.3s; }
+    .footer-links a:hover { color: #d32f2f; }
+  </style>
 </head>
 <body>
 
+<div class="auth-card">
+  <h2 class="brand-title">THE HAIDAO POST</h2>
+  <div class="brand-subtitle">Observer Authentication</div>
+
+  <div class="input-group">
+    <input type="text" id="username" placeholder="输入用户名 / Username">
+  </div>
+  <div class="input-group">
+    <input type="password" id="password" placeholder="输入密码 / Password">
+  </div>
+
+  <button onclick="doLogin()">立即验证</button>
+
+  <div class="footer-links">
+    <p><a href="register.html">新用户注册 (Register)</a></p>
+  </div>
+</div>
+
+<script>
+  function doLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      fetch('http://localhost:8080/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+      })
+      .then(res => res.json())
+      .then(data => {
+          if(data.code === 200) {
+              // 存入 JWT 令牌
+              localStorage.setItem('token', data.data);
+              alert('身份核实完毕，即将转入主页面！');
+              window.location.href = 'index.html';
+          } else {
+              alert('验证受阻：' + data.msg);
+          }
+      })
+      .catch(err => {
+          console.error("网络异常", err);
+          alert('通讯中断，请检查后端服务是否启动！');
+      });
+  }
+</script>
 </body>
 </html>

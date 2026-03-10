@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>阅读报告 - THE HAIDAO POST</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #fcfcfc; margin: 0; color: #333; }
+        .header { text-align: center; padding: 20px; background: white; border-bottom: 1px solid #eaeaea; border-top: 6px solid #d32f2f; }
+        .header h1 { font-family: 'Georgia', serif; font-size: 24px; margin: 0; color: #111; cursor: pointer; }
+        .container { max-width: 750px; margin: 50px auto; padding: 0 20px 60px 20px; }
+        .back-nav { margin-bottom: 30px; }
+        .back-nav a { color: #d32f2f; text-decoration: none; font-size: 14px; font-weight: bold; }
+
+        .article-header { margin-bottom: 40px; border-bottom: 2px solid #111; padding-bottom: 20px; }
+        .article-title { font-family: 'Georgia', serif; font-size: 38px; margin: 0 0 15px 0; line-height: 1.2; }
+
+        /* 🚨 重点：针对 Markdown 渲染后的样式优化 🚨 */
+        .article-content {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #222;
+            /* 清除默认的换行限制，交给解析器处理 */
+            word-wrap: break-word;
+        }
+        /* 让渲染出的图片自适应宽度 */
+        .article-content img { max-width: 100%; height: auto; border-radius: 4px; }
+        /* 让代码块看起来更专业 */
+        .article-content pre { background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .article-content code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; font-family: 'Consolas', monospace; }
+        /* 引用块样式 */
+        .article-content blockquote { border-left: 4px solid #d32f2f; margin: 0; padding-left: 20px; color: #666; font-style: italic; }
+    </style>
 </head>
 <body>
 
+<header class="header">
+    <h1 onclick="window.location.href='index.html'">THE HAIDAO POST</h1>
+</header>
+
+<div class="container">
+    <div class="back-nav"><a href="index.html">← 返回指挥部 (Back to Home)</a></div>
+    <div class="article-header">
+        <h1 class="article-title" id="title-display">正在加载...</h1>
+        <div style="font-size: 12px; color: #999;" id="meta-display">SECURE ACCESS ONLY</div>
+    </div>
+    <div class="article-content" id="content-display"></div>
+</div>
+
+<script>
+    // 🚨 配置 Marked.js 🚨
+    marked.setOptions({
+        breaks: true, // 支持回车换行
+        gfm: true,    // 开启 GitHub 风格
+        headerIds: false // 简洁化处理
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+        const token = localStorage.getItem('token');
+
+        fetch(`http://localhost:8080/post/${postId}`, {
+            method: 'GET',
+            headers: { 'Authorization': token }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.code === 200 && data.data) {
+                document.getElementById('title-display').innerText = data.data.title;
+
+                // 🚨 核心逻辑：使用 marked.parse() 将原始 Markdown 转换为 HTML 🚨
+                const rawMarkdown = data.data.content || "";
+                document.getElementById('content-display').innerHTML = marked.parse(rawMarkdown);
+
+                document.getElementById('meta-display').innerText = `REPORT #${data.data.id} • ${data.data.category || 'GENERAL'}`;
+            }
+        })
+        .catch(err => {
+            document.getElementById('content-display').innerHTML = "通讯中断，无法连接服务器。";
+        });
+    });
+</script>
 </body>
 </html>
