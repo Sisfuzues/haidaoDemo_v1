@@ -18,7 +18,6 @@ target/
 *.iws
 *.iml
 *.ipr
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -31,3 +30,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 忽略配置 ###
+controller/src/main/resources/application.yaml

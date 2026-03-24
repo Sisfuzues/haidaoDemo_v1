@@ -24,4 +24,8 @@ public class Result<T> {
         result.setData(null);
         return result;
     }
+
+    public boolean isSuccess() {
+        return this.code == Code.SUCCESS;
+    }
 }

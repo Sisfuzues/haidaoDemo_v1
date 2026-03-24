@@ -2,103 +2,341 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>起草观察报告 - THE HAIDAO POST</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+    <title>Write Report - The Candle</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/css/style.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@wangeditor/editor@latest/dist/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@wangeditor/plugin-md@latest/dist/index.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.21/mammoth.browser.min.js"></script>
+
     <style>
-        :root { --primary-red: #d32f2f; --bg-gray: #f9f9f9; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: var(--bg-gray); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-
-        /* 🚨 核心改动：主背景保持白色，但内容区域居中且限宽 🚨 */
-        .editor-main { flex: 1; background: white; padding: 30px 0; display: flex; flex-direction: column; overflow-y: auto; }
-
-        .write-focus-wrapper {
-            width: 90%;
-            max-width: 950px; /* 🚨 这里限制了宽度，不再是满屏 🚨 */
-            margin: 0 auto;  /* 🚨 居中对齐 🚨 */
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+        :root {
+            --eco-red: #e3120b;
+            --eco-navy: #0F2D52;
+            --eco-text: #1a1a1a;
+            --eco-border: #d9d9d9;
+            --eco-subtext: #5f6368;
+            --bg-body: #fdfcf8;
+            --font-serif: 'Georgia', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
         }
 
-        .title-input {
-            width: 100%; border: none; font-size: 32px; font-family: 'Georgia', serif;
-            font-weight: bold; margin-bottom: 20px; outline: none; color: #111;
-        }
+        body { margin: 0; padding: 0; background: var(--bg-body); font-family: var(--font-sans); color: var(--eco-text); overflow-x: hidden; }
 
-        /* 编辑器内部样式优化 */
-        .EasyMDEContainer { flex: 1; display: flex; flex-direction: column; }
-        .CodeMirror { flex: 1; font-size: 16px; border: 1px solid #eee !important; border-radius: 4px; line-height: 1.6; }
-        .editor-toolbar { border: none !important; opacity: 0.8; transition: opacity 0.3s; }
-        .editor-toolbar:hover { opacity: 1; }
-        .editor-preview-side { background: #fafafa; font-family: 'Georgia', serif; padding: 20px; }
+        /* 🎩 顶部报头 */
+        .header-wrapper { background: #fff; border-bottom: 1px solid #eee; }
+        .masthead { padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
 
-        .editor-sidebar { width: 280px; background: white; border-left: 1px solid #eee; padding: 40px 20px; display: flex; flex-direction: column; gap: 25px; }
-        .sidebar-title { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        .setting-group label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
-        .setting-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: var(--bg-gray); }
-        .publish-btn { background: var(--primary-red); color: white; border: none; padding: 14px; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .publish-btn:hover { background: #b71c1c; transform: translateY(-2px); }
+        .brand-container { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+        .logo-img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; }
+        .brand-name { font-family: 'Georgia', serif; font-size: 26px; font-weight: bold; color: var(--eco-navy); line-height: 1.1; display: flex; flex-direction: column; }
+        .brand-name small { font-size: 11px; font-weight: normal; font-family: var(--font-sans); text-transform: uppercase; color: #888; margin-top: 2px; letter-spacing: 0.5px;}
+
+        .masthead-right { display: flex; align-items: center; gap: 25px; }
+        
+        /* 🌐 语言切换 */
+        .lang-toggle-btn { cursor: pointer; color: var(--eco-navy); display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; user-select: none; }
+        .lang-toggle-btn:hover { color: var(--eco-red); }
+
+        .nav-text-link { font-size: 13px; font-weight: bold; text-transform: uppercase; text-decoration: none; color: var(--eco-text); transition: 0.2s; letter-spacing: 0.5px; }
+        .nav-text-link:hover { color: var(--eco-red); }
+
+        .eco-user-actions { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; border-left: 1px solid var(--eco-border); padding-left: 25px; }
+        .user-avatar-top { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .eco-logout { color: var(--eco-subtext); cursor: pointer; text-decoration: underline; font-weight: normal; margin-left: 5px; font-size: 13px;}
+
+        #toolbar-container { position: sticky; top: 0; z-index: 1000; background: #fff; border-bottom: 1px solid var(--eco-border); display: flex; justify-content: center; padding: 5px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+
+        .editor-wrapper { max-width: 850px; margin: 40px auto 100px; background: #fff; padding: 50px 60px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-radius: 4px; border: 1px solid #eee; }
+
+        .action-console { margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
+        .action-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: bold; color: var(--eco-subtext); cursor: pointer; text-transform: uppercase; border: 1px solid var(--eco-border); padding: 8px 16px; border-radius: 4px; background: #fafafa; transition: 0.2s; }
+        .action-btn:hover { color: var(--eco-navy); border-color: var(--eco-navy); background: #fff; }
+        .action-btn svg { width: 14px; height: 14px; }
+        
+        #cover-preview { width: 100%; max-height: 400px; object-fit: cover; margin-top: 20px; display: none; border-radius: 4px; border: 1px solid #eee; }
+
+        .title-input { width: 100%; border: none; outline: none; border-bottom: 1px solid var(--eco-border); font-family: var(--font-serif); font-size: 42px; font-weight: bold; margin-bottom: 30px; padding: 10px 0 20px 0; color: var(--eco-navy); line-height: 1.2; }
+
+        #editor-container { min-height: 500px; }
+        .w-e-text-container { font-family: var(--font-serif) !important; font-size: 18px !important; line-height: 1.8 !important; color: #222 !important; }
+
+        .publish-footer { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--eco-border); padding: 15px 40px; display: flex; justify-content: flex-end; align-items: center; gap: 20px; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.03); }
+        .meta-label { font-size: 11px; font-weight: bold; color: var(--eco-red); text-transform: uppercase; letter-spacing: 1px; }
+        .section-select { padding: 10px 15px; border: 1px solid var(--eco-border); font-size: 13px; outline: none; background: #fff; border-radius: 4px; cursor: pointer; color: var(--eco-navy); font-weight: bold;}
+        .btn-publish { background: var(--eco-navy); color: #fff; border: none; padding: 12px 40px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-publish:hover { background: var(--eco-red); box-shadow: 0 4px 10px rgba(227,18,11,0.2); transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
-<div class="editor-main">
-    <div class="write-focus-wrapper">
-        <div style="margin-bottom: 15px;"><a href="index.html" style="color:#888; text-decoration:none; font-size:13px;">← 返回指挥部</a></div>
-        <input type="text" id="post-title" class="title-input" placeholder="输入报告标题...">
-        <textarea id="post-content"></textarea>
-    </div>
+<div class="header-wrapper">
+    <header class="masthead">
+        <a href="index.html" class="brand-container">
+            <img src="/logo.jpg" alt="Logo" class="logo-img">
+            <div class="brand-name">
+                The Candle
+                <small data-i18n="illuminating">Illuminating Knowledge</small>
+            </div>
+        </a>
+
+        <div class="masthead-right">
+            <span class="lang-toggle-btn" onclick="toggleLang()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span id="lang-text">EN/简</span>
+            </span>
+
+            <a href="index.html" class="nav-text-link" data-i18n="frontpage">Frontpage</a>
+
+            <div class="eco-user-actions">
+                <img id="user-avatar-top-edit" src="https://api.dicebear.com/7.x/identicon/svg?seed=fallback" class="user-avatar-top" onclick="window.location.href='profile.html'">
+                <a href="profile.html" id="top-nickname-edit" class="user-nickname">Agent</a>
+                <span class="eco-logout" onclick="doLogout()" data-i18n="logout">Log out</span>
+            </div>
+        </div>
+    </header>
 </div>
 
-<div class="editor-sidebar">
-    <div class="sidebar-title">报告配置</div>
-    <div class="setting-group">
-        <label>分类 (Category)</label>
-        <select id="post-category">
-            <option value="Economics">经济观察</option>
-            <option value="Politics">政治分析</option>
-            <option value="International">国际事务</option>
-        </select>
+<div id="toolbar-container"></div>
+
+<main class="editor-wrapper">
+    <div class="action-console">
+        <div class="action-btn" id="upload-btn" onclick="document.getElementById('cover-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            <span data-i18n="attachCover">Attach Cover</span>
+        </div>
+        <input type="file" id="cover-file" hidden accept="image/*" onchange="uploadCover(this)">
+
+        <div class="action-btn" onclick="document.getElementById('docx-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <span data-i18n="importWord">Import Word (.docx)</span>
+        </div>
+        <input type="file" id="docx-file" hidden accept=".docx" onchange="importDocx(this)">
+
+        <div class="action-btn" onclick="document.getElementById('md-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M9 15v-6l2.5 4L14 9v6"></path></svg>
+            <span data-i18n="importMd">Import Markdown (.md)</span>
+        </div>
+        <input type="file" id="md-file" hidden accept=".md" onchange="importMarkdown(this)">
     </div>
-    <button class="publish-btn" onclick="submitPost()">发布报告</button>
-</div>
+
+    <img id="cover-preview">
+
+    <input type="text" id="post-title" class="title-input" placeholder="Headline goes here..." data-i18n-placeholder="phHeadline">
+
+    <div id="editor-container"></div>
+</main>
+
+<footer class="publish-footer">
+    <span class="meta-label" data-i18n="section">Section</span>
+    <select id="post-category" class="section-select">
+        <option value="Weekly edition">Weekly edition</option>
+        <option value="Economics">Economics</option>
+        <option value="Politics">Politics</option>
+        <option value="Technology">Technology</option>
+        <option value="International Affairs">International Affairs</option>
+    </select>
+    <button class="btn-publish" id="submit-btn" onclick="submitPost()" data-i18n="btnTransmit">Transmit Report</button>
+</footer>
 
 <script>
-    const easyMDE = new EasyMDE({
-        element: document.getElementById('post-content'),
-        autoDownloadFontAwesome: true,
-        spellChecker: false,
-        placeholder: "在此输入内容，支持 Markdown...",
-        toolbar: [
-            "bold", "italic", "heading", "|",
-            "quote", "unordered-list", "ordered-list", "|",
-            "link", "image", "|",
-            "side-by-side", "fullscreen", "|", "guide"
-        ]
+    // --- 🌐 国际化字典 ---
+    const i18nDict = {
+        en: {
+            illuminating: "Illuminating Knowledge", frontpage: "Frontpage", logout: "Log out",
+            attachCover: "Attach Cover", importWord: "Import Word (.docx)", importMd: "Import Markdown (.md)",
+            phHeadline: "Headline goes here...", section: "Section", btnTransmit: "Transmit Report",
+            btnUpdate: "Update Archive", uploading: "UPLOADING...", changeCover: "Change Cover",
+            editorPlaceholder: "Ignite sparks of thought here... (Type # then space for title)",
+            confirmOverwrite: "Importing will overwrite current content. Continue?",
+            emptyFail: "Headline and content cannot be empty.", transFail: "Transmission failed.",
+            netError: "Network disconnected.", archiveFail: "Archive load failed."
+        },
+        zh: {
+            illuminating: "点亮智慧之光", frontpage: "返回主页", logout: "退出登录",
+            attachCover: "添加封面", importWord: "导入 Word (.docx)", importMd: "导入 Markdown (.md)",
+            phHeadline: "在此输入情报标题...", section: "情报领域", btnTransmit: "发射情报",
+            btnUpdate: "更新存档", uploading: "正在上传...", changeCover: "更换封面",
+            editorPlaceholder: "在此燃起思想的火花... (支持打出 # 加空格生成标题)",
+            confirmOverwrite: "导入文档将覆盖当前内容，继续吗？",
+            emptyFail: "标题与正文不可为空，请继续你的洞察。", transFail: "发射失败，请重试。",
+            netError: "网络连接已断开。", archiveFail: "存档加载失败。"
+        }
+    };
+
+    let currentLang = localStorage.getItem('haidao_lang') || 'en';
+    const token = localStorage.getItem('token');
+    const editId = new URLSearchParams(window.location.search).get('id');
+    let editor = null;
+    let coverUrl = "";
+
+    function applyLangStatic() {
+        const dict = i18nDict[currentLang];
+        document.getElementById('lang-text').innerText = currentLang === 'en' ? 'EN/简' : '简/EN';
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (dict[key]) el.placeholder = dict[key];
+        });
+        
+        // 动态修改发布按钮文字（如果是编辑模式）
+        const submitBtn = document.getElementById('submit-btn');
+        if (editId) submitBtn.innerText = dict.btnUpdate;
+    }
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('haidao_lang', currentLang);
+        applyLangStatic();
+        // 特殊处理编辑器的 Placeholder (WangEditor 不支持动态改，但可以重新配置)
+        // 为了保险起见，如果编辑器还没写字，可以提示切换语言会刷新，或者在这里就不处理编辑器内的 placeholder 了。
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        applyLangStatic();
+        if(!token) window.location.href = 'login.html';
+
+        fetch('/user/info', { headers: { 'Authorization': token } })
+        .then(res => res.json()).then(data => {
+            if(data.code === 200) {
+                const u = data.data;
+                document.getElementById('top-nickname-edit').innerText = u.nickname || u.username;
+                if (u.avatar) document.getElementById('user-avatar-top-edit').src = u.avatar;
+            }
+        });
+
+        try {
+            if (window.wangEditor && window.wangEditorPluginMd) {
+                const { Boot } = window.wangEditor;
+                const markdownModule = window.wangEditorPluginMd.default || window.wangEditorPluginMd;
+                Boot.registerModule(markdownModule);
+            }
+        } catch (e) { console.error("MD插件加载失败", e); }
+
+        setTimeout(initEditor, 50);
     });
 
-    // 自动开启分屏预览，让你一进来就享受 Obsidian 般的快感
-    setTimeout(() => { easyMDE.toggleSideBySide(); }, 200);
-
-    function submitPost() {
-        const title = document.getElementById('post-title').value;
-        const content = easyMDE.value();
-        const category = document.getElementById('post-category').value;
-        const token = localStorage.getItem('token');
-
-        if (!title || !content) return alert("内容不能为空喵！");
-
-        fetch('http://localhost:8080/post', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': token },
-            body: JSON.stringify({ title, content, category })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.code === 200) { alert('报告已存档！'); window.location.href = 'index.html'; }
-        });
+    function initEditor() {
+        if (!window.wangEditor) return;
+        const { createEditor, createToolbar } = window.wangEditor;
+        const editorConfig = {
+            placeholder: i18nDict[currentLang].editorPlaceholder,
+            MENU_CONF: {
+                uploadImage: {
+                    async customUpload(file, insertFn) {
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        try {
+                            const res = await fetch('/upload/image', {
+                                method: 'POST', headers: { 'Authorization': token }, body: fd
+                            });
+                            const data = await res.json();
+                            if(data.code === 200) insertFn(data.data, 'Image', data.data);
+                        } catch(e) { console.error(e); }
+                    }
+                }
+            }
+        };
+        editor = createEditor({ selector: '#editor-container', html: '', config: editorConfig, mode: 'default' });
+        createToolbar({ editor, selector: '#toolbar-container', config: { excludeKeys: ['group-video', 'fullScreen'] }, mode: 'default' });
+        if (editId) loadOldData(editId);
     }
+
+    // ... (importMarkdown, importDocx 逻辑中加入 dict.confirmOverwrite 翻译)
+    function importMarkdown(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (editor.getText().trim() !== '' && !confirm(i18nDict[currentLang].confirmOverwrite)) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const htmlContent = marked.parse(e.target.result);
+            editor.setHtml(htmlContent);
+            document.getElementById('post-title').value = file.name.replace('.md', '');
+            input.value = "";
+        };
+        reader.readAsText(file);
+    }
+
+    function importDocx(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (editor.getText().trim() !== '' && !confirm(i18nDict[currentLang].confirmOverwrite)) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            mammoth.convertToHtml({ arrayBuffer: e.target.result })
+                .then(function(result) {
+                    editor.setHtml(result.value);
+                    document.getElementById('post-title').value = file.name.replace('.docx', '');
+                });
+            input.value = "";
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    async function uploadCover(input) {
+        if(!input.files[0]) return;
+        const fd = new FormData();
+        fd.append('file', input.files[0]);
+        const uploadBtn = document.getElementById('upload-btn');
+        uploadBtn.innerText = i18nDict[currentLang].uploading;
+        try {
+            const res = await fetch('/upload/image', {
+                method: 'POST', headers: { 'Authorization': token }, body: fd
+            });
+            const d = await res.json();
+            if(d.code === 200) {
+                coverUrl = d.data;
+                const img = document.getElementById('cover-preview');
+                img.src = coverUrl; img.style.display = 'block';
+                uploadBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> ${i18nDict[currentLang].changeCover}`;
+            }
+        } catch(e) { uploadBtn.innerText = i18nDict[currentLang].attachCover; }
+    }
+
+    async function loadOldData(id) {
+        try {
+            const res = await fetch(`/post/${id}`, { headers: { 'Authorization': token } });
+            const r = await res.json();
+            if(r.code === 200) {
+                document.getElementById('post-title').value = r.data.title;
+                editor.setHtml(r.data.content);
+                document.getElementById('post-category').value = r.data.category || 'Weekly edition';
+                if(r.data.imageUrl) {
+                    coverUrl = r.data.imageUrl;
+                    const img = document.getElementById('cover-preview');
+                    img.src = coverUrl; img.style.display = 'block';
+                    document.getElementById('upload-btn').innerHTML = i18nDict[currentLang].changeCover;
+                }
+            }
+        } catch(e) { console.error(i18nDict[currentLang].archiveFail); }
+    }
+
+    async function submitPost() {
+        const title = document.getElementById('post-title').value.trim();
+        const content = editor.getHtml();
+        const textOnly = editor.getText().trim();
+        const category = document.getElementById('post-category').value;
+        if(!title || !textOnly) return alert(i18nDict[currentLang].emptyFail);
+        const payload = { title, content, category, imageUrl: coverUrl };
+        if(editId) payload.id = editId;
+        const url = editId ? '/post' : '/post/add';
+        const method = editId ? 'PUT' : 'POST';
+        try {
+            const res = await fetch(url, {
+                method, headers: { 'Content-Type': 'application/json', 'Authorization': token },
+                body: JSON.stringify(payload)
+            });
+            if((await res.json()).code === 200) window.location.href = 'profile.html';
+            else alert(i18nDict[currentLang].transFail);
+        } catch(e) { alert(i18nDict[currentLang].netError); }
+    }
+
+    function doLogout() { localStorage.removeItem('token'); window.location.href = 'login.html'; }
 </script>
 </body>
 </html>

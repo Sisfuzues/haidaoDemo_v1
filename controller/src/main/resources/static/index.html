@@ -2,263 +2,378 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>THE HAIDAO POST</title>
+    <title>烛报 - The Candle | Illuminating Knowledge</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fcfcfc;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-        .header {
-            text-align: center;
-            padding: 40px 20px 20px 20px;
-            background: white;
-            border-bottom: 1px solid #eaeaea;
-            position: relative;
-            /* 咱们的灵魂红边 */
-            border-top: 6px solid #d32f2f;
-        }
-        .header h1 {
-            font-family: 'Georgia', serif;
-            font-size: 36px;
-            letter-spacing: 2px;
-            margin: 0 0 10px 0;
-            color: #111;
-        }
-        .header p {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        :root {
+            --eco-red: #e3120b;
+            --eco-navy: #0F2D52;
+            --eco-text: #1a1a1a;
+            --eco-border: #d9d9d9;
+            --eco-subtext: #5f6368;
+            --bg-body: #fdfcf8;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
         }
 
-    /* 🚨 升级版：右上角操作区布局 🚨 */
-        .header-actions {
-            position: absolute;
-            right: 40px;
-            top: 35px; /* 稍微上调一点，给头像留空间 */
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        /* 个人中心跳转链接容器 */
-        .user-profile-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 6px;
-            transition: background 0.3s;
-        }
-        .user-profile-link:hover {
-            background: #f5f5f5; /* 鼠标悬浮时给个淡淡的背景反馈 */
-        }
-        /* 头像样式 */
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%; /* 变成正圆形 */
-            border: 1px solid #eaeaea;
-            object-fit: cover;
-            background-color: #fff;
-        }
-        /* 文字信息 */
-        .user-info {
-            font-size: 14px;
-            color: #555;
-            font-family: 'Georgia', serif;
-            margin: 0;
-        }
-        .user-info span {
-            font-weight: bold;
-            color: #111;
-        }
+        body { margin: 0; padding: 0; background: var(--bg-body); font-family: var(--font-sans); color: var(--eco-text); overflow-x: hidden; }
 
+        /* 🎩 顶部报头 */
+        .header-wrapper { background: #fff; border-bottom: 2px solid var(--eco-navy); }
+        .masthead { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; max-width: 1300px; margin: 0 auto; }
 
-        .write-btn {
-            background: #d32f2f;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .write-btn:hover { background: #b71c1c; }
-        /* 退出登录按钮 */
-        .logout-btn {
-            font-size: 13px;
-            color: #888;
-            cursor: pointer;
-            text-decoration: underline;
-        }
+        .brand-container { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+        .logo-img { width: 52px; height: 52px; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .brand-name { font-family: var(--font-serif); font-size: 30px; font-weight: bold; color: var(--eco-navy); line-height: 1; display: flex; flex-direction: column; }
+        .brand-name small { font-size: 12px; font-weight: normal; font-family: var(--font-sans); text-transform: uppercase; color: var(--eco-subtext); margin-top: 4px; letter-spacing: 1px;}
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 0 20px;
-        }
-        .article-card {
-            background: white;
-            border: 1px solid #f0f0f0;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 30px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-        }
-        .article-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.06);
-        }
-        .article-meta {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .article-title {
-            font-family: 'Georgia', serif;
-            font-size: 24px;
-            margin: 0 0 15px 0;
-            color: #111;
-        }
-        .article-excerpt {
-            font-size: 15px;
-            line-height: 1.7;
-            color: #555;
-            margin: 0;
-        }
+        .masthead-right { display: flex; align-items: center; gap: 25px; }
+        
+        /* 🌐 语言切换按钮样式 */
+        .lang-toggle-btn { cursor: pointer; color: var(--eco-navy); display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: bold; user-select: none; transition: color 0.2s;}
+        .lang-toggle-btn:hover { color: var(--eco-red); }
+
+        .btn-write { background: var(--eco-navy); color: #fff; text-decoration: none; padding: 10px 22px; border-radius: 4px; font-size: 14px; font-weight: bold; transition: 0.3s; }
+        .btn-write:hover { background: var(--eco-red); transform: translateY(-2px); }
+
+        .eco-user-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: bold; border-left: 1px solid var(--eco-border); padding-left: 25px; }
+        .user-avatar-top { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+        .user-nickname { cursor: pointer; transition: 0.2s; text-decoration: none; color: var(--eco-navy); }
+        .user-nickname:hover { color: var(--eco-red); }
+
+        /* 🧭 分类导航 */
+        .nav-wrapper { border-bottom: 1px solid var(--eco-border); background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .category-nav { max-width: 1300px; margin: 0 auto; padding: 0 40px; display: flex; gap: 35px; }
+        .cat-item { padding: 15px 0; font-size: 15px; font-weight: 600; color: var(--eco-text); text-decoration: none; cursor: pointer; white-space: nowrap; transition: 0.2s; border-bottom: 3px solid transparent; }
+        .cat-item:hover { color: var(--eco-red); }
+        .cat-item.active { color: var(--eco-red); border-bottom-color: var(--eco-red); }
+
+        /* 📰 核心：杂志网格布局 */
+        .magazine-layout { max-width: 1300px; margin: 40px auto 100px; padding: 0 40px; display: grid; grid-template-columns: 1fr 340px; gap: 50px; }
+        @media (max-width: 1000px) { .magazine-layout { grid-template-columns: 1fr; } }
+
+        .main-news-flow { display: flex; flex-direction: column; gap: 60px; }
+
+        .hero-article { display: grid; grid-template-columns: 1.2fr 1fr; gap: 35px; align-items: start; border-bottom: 1px solid var(--eco-border); padding-bottom: 50px; }
+        .hero-img-box { width: 100%; height: 420px; border-radius: 4px; overflow: hidden; cursor: pointer; }
+        .hero-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .hero-img-box:hover img { transform: scale(1.04); }
+
+        .hero-meta { display: flex; flex-direction: column; height: 100%; justify-content: center; }
+        .article-tag { color: var(--eco-red); font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .hero-title { font-family: var(--font-serif); font-size: 42px; line-height: 1.1; margin: 0 0 20px 0; color: var(--eco-navy); cursor: pointer; }
+        .hero-title:hover { color: var(--eco-red); }
+        .hero-desc { font-size: 16px; color: var(--eco-subtext); line-height: 1.7; margin-bottom: 25px; }
+
+        .sub-articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        @media (max-width: 768px) { .sub-articles-grid { grid-template-columns: 1fr 1fr; } }
+
+        .article-card { display: flex; flex-direction: column; cursor: pointer; }
+        .card-img-box { width: 100%; aspect-ratio: 3 / 2; border-radius: 4px; overflow: hidden; margin-bottom: 15px; background: #eee; }
+        .card-img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s; }
+        .article-card:hover .card-img-box img { transform: scale(1.05); }
+        .article-card:hover .card-title { color: var(--eco-red); }
+        .card-title { font-family: var(--font-serif); font-size: 20px; line-height: 1.3; margin: 0; color: var(--eco-navy); transition: 0.2s; height: 3.9em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+
+        /* --- ✍️ 侧边栏 --- */
+        .sidebar { background: #f7f6f2; padding: 30px; border-radius: 8px; border: 1px solid #eee; height: fit-content; position: sticky; top: 100px; }
+        .sidebar-section { margin-bottom: 45px; }
+        .sidebar-title { font-family: var(--font-serif); font-size: 22px; font-weight: bold; border-bottom: 2px solid var(--eco-navy); padding-bottom: 10px; margin-bottom: 20px; color: var(--eco-navy); }
+
+        .brief-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e0e0e0; cursor: pointer; }
+        .brief-item:last-child { border: none; }
+        .brief-tag { font-size: 11px; font-weight: bold; color: var(--eco-red); text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .brief-text { font-size: 14px; font-weight: bold; line-height: 1.5; transition: 0.2s; }
+        .brief-item:hover .brief-text { color: var(--eco-red); }
+
+        .tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag-pill { background: #fff; border: 1px solid var(--eco-border); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; color: var(--eco-subtext); text-decoration: none; transition: 0.2s; }
+        .tag-pill:hover { border-color: var(--eco-red); color: var(--eco-red); background: #fff; }
+
+        .byline { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--eco-navy); margin-top: 15px; }
+        .byline img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+
+        .empty-state { text-align: center; padding: 100px 0; color: #bbb; font-family: var(--font-serif); font-style: italic; font-size: 20px; }
     </style>
 </head>
 <body>
 
-<header class="header">
-    <h1>THE HAIDAO POST</h1>
-    <p>Economics, Politics & International Affairs</p>
-
-    <div class="header-actions">
-        <a href="profile.html" class="user-profile-link" title="前往个人指挥中心">
-            <img src="https://api.dicebear.com/7.x/identicon/svg?seed=default" id="current-avatar" class="user-avatar" alt="头像">
-            <p class="user-info">观察员：<span id="current-username">加载中...</span></p>
+<div class="header-wrapper">
+    <header class="masthead">
+        <a href="index.html" class="brand-container">
+            <img src="/logo.jpg" alt="The Candle Logo" class="logo-img">
+            <div class="brand-name">
+                The Candle
+                <small data-i18n="illuminating">Illuminating Knowledge</small>
+            </div>
         </a>
 
-        <span class="logout-btn" onclick="doLogout()">撤退</span>
-        <a href="write.html" class="write-btn">撰写新文章</a>
-    </div>
-</header>
+        <div class="masthead-right">
+            <span class="lang-toggle-btn" onclick="toggleLang()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span id="lang-text">EN/简</span>
+            </span>
 
-<div class="container" id="article-list">
-    <p style="text-align: center; color: #999;">正在连接数据中心，获取观察报告...</p>
+            <a href="write.html" class="btn-write" data-i18n="writeArticle">Write Article</a>
+            <div class="eco-user-actions" id="user-area" style="display: none;">
+                <img id="current-avatar" src="" class="user-avatar-top" onclick="window.location.href='profile.html'">
+                <a href="profile.html" id="current-username" class="user-nickname">Agent</a>
+                <span class="eco-logout" style="cursor:pointer; font-weight:normal; margin-left:10px; color:#888;" onclick="doLogout()" data-i18n="logout">Log out</span>
+            </div>
+            <div id="login-area">
+                <a href="login.html" class="user-nickname" style="font-weight:bold;" data-i18n="signIn">Sign In</a>
+            </div>
+        </div>
+    </header>
 </div>
 
+<div class="nav-wrapper">
+    <nav class="category-nav" id="category-nav"></nav>
+</div>
+
+<main class="magazine-layout">
+    <div class="main-news-flow" id="article-list">
+        <p style="text-align:center; color:#bbb; font-style:italic; padding-top: 50px;" data-i18n="syncing">Synchronizing intelligence data...</p>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title" id="title-must-read">Must Read</div>
+            <div id="brief-container"></div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title" data-i18n="trending">Trending Topics</div>
+            <div class="tags-cloud">
+                <a href="#" class="tag-pill" onclick="filterByTag('Economics')" data-i18n="navEcon">Economics</a>
+                <a href="#" class="tag-pill" onclick="filterByTag('Politics')" data-i18n="navPol">Politics</a>
+                <a href="#" class="tag-pill" onclick="filterByTag('Technology')" data-i18n="navTech">Technology</a>
+                <a href="#" class="tag-pill" onclick="filterByTag('International Affairs')" data-i18n="navIntl">Global Affairs</a>
+                <a href="#" class="tag-pill" onclick="filterByTag('Weekly edition')" data-i18n="navWeekly">Weekly</a>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title" id="title-active-obs">Voices that Matter</div>
+            <div id="opinion-container"></div>
+        </div>
+    </aside>
+</main>
+
 <script>
-    // 页面一加载，就执行“查岗”和“拉取数据”
+    // --- 🌐 国际化 (i18n) 字典配置 ---
+    const i18nDict = {
+        en: {
+            illuminating: "Illuminating Knowledge", writeArticle: "Write Article", logout: "Log out", signIn: "Sign In",
+            navAll: "All", navWeekly: "Weekly edition", navEcon: "Economics", navPol: "Politics", navTech: "Technology", navIntl: "International Affairs",
+            syncing: "Synchronizing intelligence data...", trending: "Trending Topics",
+            mustRead: "Must Read", activeObs: "Active Observers", awaitingObs: "Awaiting intelligence officers...",
+            emptySector: "No dispatches found in this sector.", connLost: "Secure connection lost.",
+            by: "BY", observer: "Observer", agent: "Agent", now: "Now", correspondent: "Correspondent",
+            featured: "Featured", dispatch: "Dispatch"
+        },
+        zh: {
+            illuminating: "点亮智慧之光", writeArticle: "撰写文章", logout: "退出登录", signIn: "登录",
+            navAll: "全部", navWeekly: "每周特稿", navEcon: "经济学", navPol: "政治学", navTech: "前沿科技", navIntl: "国际事务",
+            syncing: "正在同步情报数据...", trending: "热门话题",
+            mustRead: "必读推荐", activeObs: "活跃观察员", awaitingObs: "等待情报官员接入...",
+            emptySector: "该领域暂无情报。", connLost: "安全连接已断开。",
+            by: "作者", observer: "观察者", agent: "特工", now: "刚刚", correspondent: "特约记者",
+            featured: "头条焦点", dispatch: "快讯"
+        }
+    };
+
+    // 分类名到字典 key 的映射（为了保持底层过滤逻辑用英文）
+    const catMap = {
+        'All': 'navAll', 'Weekly edition': 'navWeekly', 'Economics': 'navEcon',
+        'Politics': 'navPol', 'International Affairs': 'navIntl', 'Technology': 'navTech'
+    };
+
+    let currentLang = localStorage.getItem('haidao_lang') || 'en';
+
+    function applyLangStatic() {
+        const dict = i18nDict[currentLang];
+        document.getElementById('lang-text').innerText = currentLang === 'en' ? 'EN/简' : '简/EN';
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+    }
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('haidao_lang', currentLang);
+        applyLangStatic();
+        renderNav(); // 重新渲染导航栏语言
+        if(allArticles.length > 0) { renderPosts(); } // 重新渲染文章列表语言
+    }
+
+    // --- 🚨 原有核心逻辑 ---
+    const token = localStorage.getItem('token');
+    let allArticles = [];
+    const categories = ['All', 'Weekly edition', 'Economics', 'Politics', 'International Affairs', 'Technology'];
+    let currentCategory = 'All'; // 底层始终保持英文，方便过滤
+
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. 检查钱包里有没有 JWT 令牌
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('门卫拦截：未检测到通行证，请先验证身份！');
-            window.location.href = 'login.html';
+        applyLangStatic();
+        checkUserStatus();
+        renderNav();
+        fetchArticles();
+    });
+
+    function checkUserStatus() {
+        if(!token) return;
+        fetch('/user/info', { headers: { 'Authorization': token } })
+        .then(res => res.json()).then(data => {
+            if(data.code === 200) {
+                document.getElementById('login-area').style.display = 'none';
+                document.getElementById('user-area').style.display = 'flex';
+                document.getElementById('current-username').innerText = data.data.nickname || data.data.username;
+                document.getElementById('current-avatar').src = data.data.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${data.data.username}`;
+            }
+        }).catch(() => {});
+    }
+
+    function doLogout() { localStorage.removeItem('token'); window.location.reload(); }
+
+    function renderNav() {
+        const nav = document.getElementById('category-nav');
+        const dict = i18nDict[currentLang];
+        nav.innerHTML = '';
+        categories.forEach(cat => {
+            const a = document.createElement('a');
+            a.className = `cat-item ${cat === currentCategory ? 'active' : ''}`;
+            a.innerText = dict[catMap[cat]] || cat; // 显示翻译后的名称
+            a.onclick = () => { currentCategory = cat; renderNav(); renderPosts(); }; // 点击时底层赋的值仍是英文
+            nav.appendChild(a);
+        });
+    }
+
+    function filterByTag(tag) {
+        currentCategory = tag;
+        renderNav();
+        renderPosts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function fetchArticles() {
+        fetch('/post/list', { headers: token ? { 'Authorization': token } : {} })
+        .then(res => res.json())
+        .then(data => {
+            if(data.code === 200) { allArticles = data.data || []; renderPosts(); }
+        }).catch(() => {
+            document.getElementById('article-list').innerHTML = `<p class="empty-state">${i18nDict[currentLang].connLost}</p>`;
+        });
+    }
+
+    function stripText(text) {
+        if (!text) return "";
+        let clean = text.replace(/<[^>]+>/g, '');
+        clean = clean.replace(/[#*`~_]/g, '').replace(/\[.*?\]\(.*?\)/g, '');
+        return clean.substring(0, 150) + "...";
+    }
+
+    function renderPosts() {
+        const dict = i18nDict[currentLang];
+        const list = document.getElementById('article-list');
+        const brief = document.getElementById('brief-container');
+        const opinion = document.getElementById('opinion-container');
+        list.innerHTML = ''; brief.innerHTML = ''; opinion.innerHTML = '';
+
+        // 过滤使用底层保存的英文 currentCategory
+        const filtered = currentCategory === 'All' ? allArticles : allArticles.filter(p => p.category === currentCategory);
+        if (filtered.length === 0) {
+            list.innerHTML = `<p class="empty-state">${dict.emptySector}</p>`;
             return;
         }
 
-        // 🚨 功能 2：获取账户信息 (需要后端提供 /user/info 接口) 🚨
-        // 注意：这里我在请求头里塞入了 JWT 令牌！
-        fetch('http://localhost:8080/user/info', {
-            method: 'GET',
-            headers: {
-                'Authorization': token  // 掏出令牌给后端门卫看
+        const defaultImg = "/logo.jpg";
+
+        // 1. 头条大稿
+        const hero = filtered[0];
+        const hasHeroImg = hero.imageUrl && hero.imageUrl.trim() !== "";
+        const heroCatText = dict[catMap[hero.category]] || hero.category || dict.featured;
+        
+        list.innerHTML += `
+            <article class="hero-article ${hasHeroImg ? '' : 'no-image'}">
+                <div class="hero-img-box" onclick="location.href='read.html?id=${hero.id}'">
+                    <img src="${hasHeroImg ? hero.imageUrl : defaultImg}" style="${hasHeroImg ? '' : 'object-fit: contain; background: #f0f0f0;'}">
+                </div>
+                <div class="hero-meta">
+                    <span class="article-tag">${heroCatText}</span>
+                    <h1 class="hero-title" onclick="location.href='read.html?id=${hero.id}'">${hero.title}</h1>
+                    <p class="hero-desc">${stripText(hero.content)}</p>
+                    <div class="byline">
+                        <img src="${hero.userAvatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${hero.userName}`}" onclick="location.href='author-profile.html?id=${hero.userId}'">
+                        <span onclick="location.href='author-profile.html?id=${hero.userId}'">${dict.by} ${hero.userName || dict.observer} — ${hero.createTime ? hero.createTime.substring(0,10) : dict.now}</span>
+                    </div>
+                </div>
+            </article>
+        `;
+
+        // 2. 网格次条
+        const gridItems = filtered.slice(1, 4);
+        if(gridItems.length > 0) {
+            let gridHTML = `<div class="sub-articles-grid">`;
+            gridItems.forEach(p => {
+                const hasImg = p.imageUrl && p.imageUrl.trim() !== "";
+                const pCatText = dict[catMap[p.category]] || p.category || dict.dispatch;
+                gridHTML += `
+                    <div class="article-card" onclick="location.href='read.html?id=${p.id}'">
+                        <div class="card-img-box" style="${hasImg ? '' : 'background: #fdfcf8; border: 1px solid #eee; display:flex; align-items:center; justify-content:center;'}">
+                            ${hasImg ? `<img src="${p.imageUrl}">` : `<img src="${defaultImg}" style="width: 50%; height: 50%; object-fit: contain; opacity: 0.1;">`}
+                        </div>
+                        <span class="article-tag" style="font-size:10px;">${pCatText}</span>
+                        <h3 class="card-title">${p.title}</h3>
+                        <div class="byline" style="margin-top:12px;">
+                            <span style="color:#999; font-weight:normal">${dict.by} ${p.userName || dict.agent}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            gridHTML += `</div>`;
+            list.innerHTML += gridHTML;
+        }
+
+        // --- 右侧边栏动态更新 ---
+        document.getElementById('title-must-read').innerText = dict.mustRead;
+        document.getElementById('title-active-obs').innerText = dict.activeObs;
+
+        const mustReadItems = allArticles.filter(p => p.id !== hero.id).slice(0, 4);
+        mustReadItems.forEach(p => {
+            const bCatText = dict[catMap[p.category]] || p.category;
+            brief.innerHTML += `
+                <div class="brief-item" onclick="location.href='read.html?id=${p.id}'">
+                    <span class="brief-tag">${bCatText}</span>
+                    <div class="brief-text">${p.title}</div>
+                </div>
+            `;
+        });
+
+        const uniqueAuthors = [];
+        const authorIds = new Set();
+        allArticles.forEach(post => {
+            if (post.userId && !authorIds.has(post.userId)) {
+                authorIds.add(post.userId);
+                uniqueAuthors.push({ id: post.userId, name: post.userName, avatar: post.userAvatar });
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-           if(data.code === 200) {
-              const username = data.data.username;
-              document.getElementById('current-username').innerText = username;
+        });
 
-              // 🚨 动态头像魔法：如果数据库里有头像字段(avatar)，就用真实的；
-              // 如果没有，我就用一个开源的像素头像 API，根据你的用户名自动生成一个独一无二的几何头像！
-              const avatarUrl = data.data.avatar ? data.data.avatar : `https://api.dicebear.com/7.x/identicon/svg?seed=${username}`;
-              document.getElementById('current-avatar').src = avatarUrl;
-
-           } else {
-                // 如果令牌过期或造假，后端会报错
-                alert('身份过期，请重新验证！');
-                doLogout();
-            }
-        })
-        .catch(err => console.error("获取用户信息失败", err));
-
-
-        // 🚨 功能 1：获取所有文章列表 (需要后端提供 /article/list 接口) 🚨
-       // 🚨 功能 1：获取所有文章列表 (完美对接你的 PostController) 🚨
-      fetch('http://localhost:8080/post', {  // <--- 这里改成了你的 /post
-          method: 'GET',
-          headers: { 'Authorization': token }
-      })
-      .then(res => res.json())
-      .then(data => {
-          if(data.code === 200) {
-              renderPosts(data.data); // 拿到真实数据后，调用渲染函数
-          }
-      })
-      .catch(err => console.error("获取报告列表失败", err));
-  }); // DOMContentLoaded 结束括号
-
-  // 把后端传来的 Post 列表变成漂亮的 HTML 卡片
-  // 把后端传来的 Post 列表变成漂亮的 HTML 卡片
-    // 🚨 核心逻辑：把 Markdown 乱码洗成纯净文字 🚨
-  function stripMarkdown(text) {
-      if (!text) return "";
-      return text
-          .replace(/[#*`~_]/g, '')        // 剔除 #, *, `, ~, _ 这些符号
-          .replace(/\[.*?\]\(.*?\)/g, '') // 剔除 [链接](url)
-          .substring(0, 80) + "...";      // 摘要留 80 字就行，多了乱
-  }
-
-  function renderPosts(posts) {
-      const listContainer = document.getElementById('article-list');
-      listContainer.innerHTML = '';
-
-      posts.forEach(post => {
-          // 🚨 这里调用过滤器，把你的“# 元神牛逼”变成“元神牛逼” 🚨
-          const cleanExcerpt = stripMarkdown(post.content);
-
-          const articleHtml = `
-              <article class="article-card" onclick="viewPost(${post.id})">
-                  <div class="article-meta">OBSERVATION LOG • REPORT #${post.id}</div>
-                  <h2 class="article-title">${post.title || '无标题报告'}</h2>
-                  <p class="article-excerpt">${cleanExcerpt}</p>
-              </article>
-          `;
-          listContainer.innerHTML += articleHtml;
-      });
-  }
-
-  // 🚨 新增：跳转到阅读页，并在 URL 尾巴上带上文章的 ID
-  function viewPost(postId) {
-      window.location.href = `read.html?id=${postId}`;
-  }
-// 🚨 新增：把带 Markdown 的乱码变成纯净的文字摘要 🚨
-  function stripMarkdown(text) {
-      if (!text) return "";
-      return text
-          .replace(/[#*`~_]/g, '') // 剔除常见的 Markdown 符号
-          .replace(/\[.*?\]\(.*?\)/g, '') // 剔除链接
-          .substring(0, 100) + "..."; // 截取前100字
-  }
-    // 退出登录逻辑：撕毁令牌，滚回登录页
-    function doLogout() {
-        localStorage.removeItem('token');
-        window.location.href = 'login.html';
+        if (uniqueAuthors.length > 0) {
+            uniqueAuthors.slice(0, 5).forEach(author => {
+                opinion.innerHTML += `
+                    <div class="brief-item" style="display:flex; gap:12px; align-items:center; border:none; padding-bottom:10px;" onclick="location.href='author-profile.html?id=${author.id}'">
+                        <img src="${author.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${author.name}`}" style="width:40px; height:40px; border-radius:50%; border: 1px solid #eee;">
+                        <div>
+                            <div style="font-size:14px; font-weight:bold; color:var(--eco-navy);">${author.name}</div>
+                            <div style="font-size:11px; color:var(--eco-subtext); margin-top:2px;">${dict.correspondent}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            opinion.innerHTML = `<div style="font-size:12px; color:#999; font-style:italic;">${dict.awaitingObs}</div>`;
+        }
     }
 </script>
 </body>

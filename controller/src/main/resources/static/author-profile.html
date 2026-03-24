@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Correspondent Profile - The Candle</title>
+    <style>
+        /* 🎨 统一设计令牌 */
+        :root {
+            --eco-red: #E3120B;
+            --eco-black: #000000;
+            --eco-dark-grey: #333333;
+            --eco-light-grey: #E6E6E6;
+            --eco-text-grey: #5F6368;
+            --eco-navy: #0F2D52;
+            --bg-body: #fdfcf8;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body { font-family: var(--font-sans); margin: 0; padding: 0; color: var(--eco-black); background: var(--bg-body); }
+
+        /* 🎩 统一样式的报头 */
+        .masthead { max-width: 1200px; margin: 0 auto; padding: 30px 20px 20px 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+
+        .brand-container { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+        .logo-img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; }
+        .brand-name { font-family: var(--font-serif); font-size: 26px; font-weight: bold; color: var(--eco-navy); line-height: 1.1; display: flex; flex-direction: column; }
+        .brand-name small { font-size: 11px; font-weight: normal; font-family: var(--font-sans); text-transform: uppercase; color: #888; margin-top: 2px; letter-spacing: 0.5px;}
+
+        .user-actions { display: flex; gap: 20px; align-items: center; font-size: 14px; font-weight: bold; }
+        
+        /* 🌐 语言切换 */
+        .lang-toggle-btn { cursor: pointer; color: var(--eco-navy); display: flex; align-items: center; gap: 4px; user-select: none; }
+        .lang-toggle-btn:hover { color: var(--eco-red); }
+
+        .subscribe-btn { background: var(--eco-navy); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; transition: 0.2s;}
+        .subscribe-btn:hover { opacity: 0.9; }
+
+        /* 🧭 导航 */
+        .navigation { max-width: 1200px; margin: 0 auto; border-top: 1px solid var(--eco-light-grey); border-bottom: 1px solid var(--eco-black); padding: 12px 20px; display: flex; gap: 25px; overflow-x: auto; white-space: nowrap; }
+        .nav-item { font-size: 14px; font-weight: 500; cursor: pointer; color: var(--eco-black); transition: color 0.2s;}
+        .nav-item:hover { color: var(--eco-red); }
+
+        /* 📰 布局 */
+        .profile-container { max-width: 1200px; margin: 50px auto; padding: 0 20px; display: grid; grid-template-columns: 300px 1fr; gap: 60px; }
+        @media (max-width: 800px) { .profile-container { grid-template-columns: 1fr; } }
+
+        /* 👤 左栏 */
+        .author-bio-card { border-right: 1px solid var(--eco-light-grey); padding-right: 40px; }
+        .author-label { color: var(--eco-red); font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        .profile-avatar-large { width: 100%; aspect-ratio: 1; border-radius: 4px; object-fit: cover; margin-bottom: 20px; border: 1px solid var(--eco-light-grey); }
+        .profile-name { font-family: var(--font-serif); font-size: 32px; margin: 0 0 5px 0; line-height: 1.1; color: var(--eco-navy); word-wrap: break-word; }
+        .profile-id { font-family: monospace; font-size: 12px; color: var(--eco-text-grey); margin-bottom: 20px; }
+
+        .msg-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: var(--eco-navy); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 20px; }
+        .msg-btn:hover { background: var(--eco-red); }
+
+        /* 📄 右栏 */
+        .section-title { font-family: var(--font-serif); font-size: 24px; border-bottom: 1px solid var(--eco-black); padding-bottom: 10px; margin-bottom: 30px; color: var(--eco-navy);}
+        .article-item { border-bottom: 1px solid var(--eco-light-grey); padding-bottom: 25px; margin-bottom: 25px; cursor: pointer; }
+        .article-item:hover .item-title { color: var(--eco-red); text-decoration: underline; }
+        .item-title { font-family: var(--font-serif); font-size: 24px; margin: 0 0 10px 0; color: var(--eco-navy); transition: 0.2s; word-wrap: break-word;}
+        .item-date { font-size: 12px; color: var(--eco-text-grey); }
+    </style>
+</head>
+<body>
+
+<header class="masthead">
+    <a href="index.html" class="brand-container">
+        <img src="/logo.jpg" alt="Logo" class="logo-img">
+        <div class="brand-name">
+            The Candle
+            <small data-i18n="illuminating">Illuminating Knowledge</small>
+        </div>
+    </a>
+    <div class="user-actions">
+        <span class="lang-toggle-btn" onclick="toggleLang()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            <span id="lang-text">EN/简</span>
+        </span>
+        <a href="write.html" class="subscribe-btn" data-i18n="writeArticle">Write Article</a>
+        <span onclick="doLogout()" style="cursor:pointer; color: var(--eco-text-grey);" data-i18n="logout">Log out</span>
+    </div>
+</header>
+
+<nav class="navigation">
+    <span class="nav-item" onclick="window.location.href='index.html'" data-i18n="navWeekly">Weekly edition</span>
+    <span class="nav-item" data-i18n="navEcon">Economics</span>
+    <span class="nav-item" data-i18n="navPol">Politics</span>
+    <span class="nav-item" data-i18n="navTech">Technology</span>
+    <span class="nav-item" data-i18n="navIntl">International Affairs</span>
+</nav>
+
+<main class="profile-container">
+    <aside class="author-bio-card" id="author-card">
+        <div class="author-label" data-i18n="profileLabel">Correspondent Profile</div>
+        <div style="text-align: center; color: #999; padding-top: 100px;" data-i18n="establishing">Establishing secure link...</div>
+    </aside>
+
+    <section class="author-feed">
+        <div class="section-title" data-i18n="reportsTitle">Latest Observation Reports</div>
+        <div id="posts-list">
+            <p style="color: #999; font-style: italic;" data-i18n="waitingData">Waiting for data stream...</p>
+        </div>
+    </section>
+</main>
+
+<script>
+    // --- 🌐 国际化字典 ---
+    const i18nDict = {
+        en: {
+            illuminating: "Illuminating Knowledge", writeArticle: "Write Article", logout: "Log out",
+            navWeekly: "Weekly edition", navEcon: "Economics", navPol: "Politics", navTech: "Technology", navIntl: "International Affairs",
+            profileLabel: "Correspondent Profile", establishing: "Establishing secure link...", 
+            reportsTitle: "Latest Observation Reports", waitingData: "Waiting for data stream...",
+            chiefObs: "Chief Observer", agentId: "AGENT ID", msgBtn: "Secure Message",
+            bioText: "Senior correspondent specializing in decentralized communications and maritime affairs at The Candle.",
+            noReports: "No reports filed by this correspondent yet.", publishedOn: "Published on ", untitled: "Untitled Report"
+        },
+        zh: {
+            illuminating: "点亮智慧之光", writeArticle: "撰写文章", logout: "退出登录",
+            navWeekly: "每周特稿", navEcon: "经济学", navPol: "政治学", navTech: "前沿科技", navIntl: "国际事务",
+            profileLabel: "观察员档案", establishing: "正在建立安全连接...", 
+            reportsTitle: "最新观察报告", waitingData: "正在等待数据流...",
+            chiefObs: "首席观察员", agentId: "特工 ID", msgBtn: "发起私密对话",
+            bioText: "资深通讯员，专注于去中心化通信以及《烛报》的海事事务研究。",
+            noReports: "该观察员尚未提交任何报告。", publishedOn: "发布于 ", untitled: "未命名报告"
+        }
+    };
+
+    let currentLang = localStorage.getItem('haidao_lang') || 'en';
+    const token = localStorage.getItem('token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorId = urlParams.get('id');
+
+    function applyLangStatic() {
+        const dict = i18nDict[currentLang];
+        document.getElementById('lang-text').innerText = currentLang === 'en' ? 'EN/简' : '简/EN';
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+    }
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('haidao_lang', currentLang);
+        applyLangStatic();
+        // 动态数据需要重绘
+        location.reload(); 
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        applyLangStatic();
+        if (!token) { window.location.href = 'login.html'; return; }
+        if (!authorId) { window.location.href = 'index.html'; return; }
+
+        // 获取数据
+        fetch(`/user/${authorId}`, { headers: { 'Authorization': token } })
+            .then(res => res.json()).then(data => { if(data.code === 200) renderAuthorProfile(data.data); });
+
+        fetch(`/post/author/${authorId}`, { headers: { 'Authorization': token } })
+            .then(res => res.json()).then(data => { if(data.code === 200) renderAuthorPosts(data.data); });
+    });
+
+    function renderAuthorProfile(user) {
+        const dict = i18nDict[currentLang];
+        const displayName = (user.nickname === '请输入文本' || !user.nickname) ? user.username : user.nickname;
+        const avatarUrl = user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
+
+        document.getElementById('author-card').innerHTML = `
+            <div class="author-label">${dict.chiefObs}</div>
+            <img src="${avatarUrl}" class="profile-avatar-large">
+            <h1 class="profile-name">${displayName}</h1>
+            <div class="profile-id">${dict.agentId}: #${user.id || 'N/A'}</div>
+
+            <p style="font-size: 14px; line-height: 1.6; color: var(--eco-dark-grey);">
+                ${dict.bioText}
+            </p>
+
+            <button class="msg-btn" onclick="openSecureComms()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                ${dict.msgBtn}
+            </button>
+        `;
+    }
+
+    function renderAuthorPosts(posts) {
+        const dict = i18nDict[currentLang];
+        const list = document.getElementById('posts-list');
+        if(!posts || posts.length === 0) {
+            list.innerHTML = `<p style="color:#999; font-style:italic;">${dict.noReports}</p>`;
+            return;
+        }
+
+        list.innerHTML = posts.map(post => `
+            <div class="article-item" onclick="location.href='read.html?id=${post.id}'">
+                <h3 class="item-title">${post.title || dict.untitled}</h3>
+                <div class="item-date">${dict.publishedOn}${post.createTime ? post.createTime.substring(0, 10) : 'Archive'}</div>
+            </div>
+        `).join('');
+    }
+
+    function openSecureComms() {
+        if (!authorId) return;
+        window.location.href = `profile.html?chatWith=${authorId}`;
+    }
+
+    function doLogout() { localStorage.removeItem('token'); window.location.href = 'login.html'; }
+</script>
+</body>
+</html>

@@ -2,138 +2,475 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>个人中心 - THE HAIDAO POST</title>
+    <title>Command Center - The Candle</title>
     <style>
-        :root { --primary-red: #d32f2f; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #fcfcfc; margin: 0; }
-        .header { text-align: center; padding: 40px; background: white; border-bottom: 1px solid #eaeaea; border-top: 6px solid var(--primary-red); }
-        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        /* 🌟 统一品牌视觉令牌 */
+        :root {
+            --eco-red: #e3120b;
+            --eco-navy: #0F2D52; /* 知识蓝 */
+            --eco-text: #1a1a1a;
+            --eco-border: #d9d9d9;
+            --eco-subtext: #5f6368;
+            --bg-body: #fdfcf8; /* 米白背景 */
+            --font-serif: 'Georgia', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
 
-        /* 左侧：用户信息卡 */
-        .user-card { background: white; padding: 30px; border-radius: 8px; border: 1px solid #eee; text-align: center; height: fit-content; }
-        .avatar-wrapper { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; cursor: pointer; }
-        .avatar-large { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f0f0f0; transition: 0.3s; }
-        .avatar-wrapper:hover .avatar-large { filter: brightness(0.7); }
-        .avatar-wrapper::after { content: '更换头像'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 12px; opacity: 0; transition: 0.3s; }
-        .avatar-wrapper:hover::after { opacity: 1; }
+        body { font-family: var(--font-sans); background: var(--bg-body); margin: 0; color: var(--eco-text); }
 
-        .nickname-display { font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .edit-icon { cursor: pointer; font-size: 16px; color: #999; }
-        .edit-input { width: 80%; padding: 5px; text-align: center; font-size: 20px; border: 1px solid #ddd; display: none; }
+        /* 顶部导航 */
+        .eco-header { padding: 20px 40px 0 40px; max-width: 1400px; margin: 0 auto; }
+        .eco-top-bar { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;}
 
-        /* 右侧：内容区切换 */
-        .content-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
-        .tab-item { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #888; }
-        .tab-item.active { color: var(--primary-red); border-bottom: 2px solid var(--primary-red); margin-bottom: -2px; }
+        /* 🌟 统一品牌 Logo 样式 */
+        .brand-container { display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
+        .logo-img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid #eee; }
+        .brand-name { font-family: var(--font-serif); font-size: 26px; font-weight: bold; color: var(--eco-navy); line-height: 1.1; display: flex; flex-direction: column; }
+        .brand-name small { font-size: 11px; font-weight: normal; font-family: var(--font-sans); text-transform: uppercase; color: #888; margin-top: 2px; letter-spacing: 0.5px;}
 
-        .report-item { background: white; padding: 20px; border-radius: 4px; border: 1px solid #f0f0f0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-delete { color: var(--primary-red); cursor: pointer; font-size: 13px; }
+        .eco-user-actions { display: flex; align-items: center; gap: 20px; font-size: 14px; font-weight: bold; color: var(--eco-navy); }
+        
+        /* 🌐 语言切换按钮 */
+        .lang-toggle-btn { cursor: pointer; color: var(--eco-navy); display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; user-select: none; transition: 0.2s;}
+        .lang-toggle-btn:hover { color: var(--eco-red); }
+
+        .eco-logout { color: var(--eco-subtext); cursor: pointer; text-decoration: underline; font-weight: normal; }
+        .eco-logout:hover { color: var(--eco-red); }
+
+        .eco-nav { display: flex; gap: 30px; border-top: 1px solid var(--eco-border); border-bottom: 1px solid var(--eco-border); padding: 12px 0; margin-bottom: 40px; }
+        .eco-nav-item { font-size: 14px; cursor: pointer; font-weight: 500; color: var(--eco-text); transition: 0.2s;}
+        .eco-nav-item:hover { color: var(--eco-red); }
+        .eco-nav-item.active { color: var(--eco-red); font-weight: bold; }
+
+        /* 主体布局 */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 40px 60px; display: grid; grid-template-columns: 260px 1fr; gap: 60px; }
+
+        /* 左侧观察员档案卡 */
+        .user-card { text-align: left; }
+        .avatar-wrapper { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: 20px; cursor: pointer; overflow: hidden; border: 1px solid var(--eco-border); background: #fff; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);}
+        .avatar-large { width: 100%; height: 100%; object-fit: cover; filter: grayscale(20%); transition: 0.3s; }
+        .avatar-wrapper:hover .avatar-large { filter: grayscale(0%); transform: scale(1.02); }
+        .btn-save-avatar { display: none; background: var(--eco-navy); color: #fff; border: none; padding: 10px; width: 100%; font-size: 12px; font-weight: bold; cursor: pointer; margin-bottom: 20px; border-radius: 4px; transition: 0.2s;}
+        .btn-save-avatar:hover { background: var(--eco-red); }
+
+        .nickname-display { font-family: var(--font-serif); font-size: 32px; margin-bottom: 10px; line-height: 1.1; color: var(--eco-navy);}
+        .user-id-row { font-size: 12px; color: var(--eco-subtext); border-bottom: 1px solid var(--eco-border); padding-bottom: 20px; margin-bottom: 20px; }
+        .stat-line { font-size: 13px; margin-bottom: 12px; display: flex; justify-content: space-between; }
+
+        /* 右侧内容区 */
+        .section-header { font-family: var(--font-serif); font-size: 28px; border-bottom: 2px solid var(--eco-navy); padding-bottom: 15px; margin-bottom: 30px; color: var(--eco-navy);}
+        .settings-block { margin-bottom: 40px; padding-bottom: 30px; border-bottom: 1px solid var(--eco-border); }
+        .settings-title { font-family: var(--font-serif); font-size: 20px; margin-bottom: 20px; color: var(--eco-red); }
+        .form-group { margin-bottom: 20px; max-width: 450px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; color: var(--eco-navy); }
+        .form-group input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--eco-border); background: #fff; font-size: 14px; border-radius: 4px; outline: none; transition: 0.2s;}
+        .form-group input:focus { border-color: var(--eco-navy); }
+        .btn-save { background: var(--eco-navy); color: #fff; border: none; padding: 10px 24px; cursor: pointer; font-size: 13px; font-weight: bold; transition: 0.3s; border-radius: 4px; }
+        .btn-save:hover { background: var(--eco-red); }
+
+        /* --- 加密通讯区 --- */
+        .chat-wrapper { display: flex; height: 600px; border: 1px solid var(--eco-border); background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border-radius: 4px; overflow: hidden;}
+        .chat-sidebar { width: 280px; border-right: 1px solid var(--eco-border); background: #fafafa; display: flex; flex-direction: column; }
+        .ws-status { padding: 15px; font-size: 12px; font-weight: bold; border-bottom: 1px solid var(--eco-border); display: flex; align-items: center; gap: 8px; background: #fff;}
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff5132; transition: 0.3s; }
+        .status-dot.online { background: #00c853; }
+
+        .contact-list { flex: 1; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+        .contact-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+        .contact-item:hover { background: #f0f0f0; }
+        .contact-item.active { background: #e6e6e6; border-left: 3px solid var(--eco-red); padding-left: 12px; }
+
+        .contact-avatar-box { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
+        .contact-avatar { width: 100%; height: 100%; border-radius: 4px; object-fit: cover; }
+        .unread-badge { position: absolute; top: -5px; right: -5px; background: var(--eco-red); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.2s;}
+        .unread-badge.show { opacity: 1; }
+
+        .contact-info { flex: 1; overflow: hidden; }
+        .contact-name-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .contact-name { font-size: 14px; font-weight: bold; color: var(--eco-navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .contact-time { font-size: 10px; color: #999; }
+        .last-msg { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: #fff; position: relative;}
+        .chat-header { padding: 15px 20px; border-bottom: 1px solid var(--eco-border); font-family: var(--font-serif); font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 10px; color: var(--eco-navy);}
+        .chat-header img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; display: none; }
+        .chat-history { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: #fff; }
+
+        .msg-row { display: flex; width: 100%; gap: 12px; margin-bottom: 10px; }
+        .msg-row.left { justify-content: flex-start; flex-direction: row; }
+        .msg-row.right { justify-content: flex-start; flex-direction: row-reverse; }
+
+        .msg-avatar { width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;}
+        .bubble-wrapper { max-width: 65%; display: flex; flex-direction: column; }
+        .msg-row.left .bubble-wrapper { align-items: flex-start; }
+        .msg-row.right .bubble-wrapper { align-items: flex-end; }
+
+        .bubble { padding: 10px 14px; border-radius: 8px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+        .msg-row.left .bubble { background: #f0f0f0; color: #333; border-top-left-radius: 0; }
+        .msg-row.right .bubble { background: var(--eco-navy); color: #ffffff; border-top-right-radius: 0; }
+
+        .chat-input-area { height: 70px; border-top: 1px solid var(--eco-border); display: flex; padding: 15px; box-sizing: border-box; background: #fafafa; gap: 10px;}
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid var(--eco-border); border-radius: 4px; outline: none; font-size: 14px; background: #fff; }
+        .btn-send-msg { background: var(--eco-navy); color: white; border: none; padding: 0 25px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-send-msg:hover { background: var(--eco-red); }
+
+        .no-chat-mask { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #fff; display: flex; align-items: center; justify-content: center; color: #999; z-index: 10; font-style: italic; }
+        .report-row:hover .item-title-link { color: var(--eco-red); text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<header class="header">
-    <h1 style="font-family: 'Georgia', serif; cursor:pointer;" onclick="window.location.href='index.html'">THE HAIDAO POST</h1>
+<header class="eco-header">
+    <div class="eco-top-bar">
+        <a href="index.html" class="brand-container">
+            <img src="/logo.jpg" alt="Logo" class="logo-img">
+            <div class="brand-name">
+                The Candle
+                <small data-i18n="illuminating">Illuminating Knowledge</small>
+            </div>
+        </a>
+        <div class="eco-actions-wrapper" style="display: flex; gap: 30px; align-items: center;">
+            <span class="lang-toggle-btn" onclick="toggleLang()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span id="lang-text">EN/简</span>
+            </span>
+            <div class="eco-user-actions">
+                <span id="top-nickname">Observer</span>
+                <span class="eco-logout" onclick="doLogout()" data-i18n="logout">Log out</span>
+            </div>
+        </div>
+    </div>
+    <nav class="eco-nav">
+        <span class="eco-nav-item active" onclick="switchTab('messages', this)" data-i18n="navMessages">Encrypted Messages</span>
+        <span class="eco-nav-item" onclick="switchTab('reports', this)" data-i18n="navReports">Observation Reports</span>
+        <span class="eco-nav-item" onclick="switchTab('settings', this)" data-i18n="navSettings">Account Settings</span>
+    </nav>
 </header>
 
 <div class="container">
     <aside class="user-card">
-        <div class="avatar-wrapper" onclick="document.getElementById('avatar-upload').click()">
-            <img src="" id="display-avatar" class="avatar-large">
-            <input type="file" id="avatar-upload" style="display:none" onchange="uploadAvatar(this)">
-        </div>
+        <div style="color:var(--eco-red); font-size:12px; font-weight:bold; margin-bottom:5px;" data-i18n="chiefLabel">CHIEF OBSERVER</div>
+        <div class="nickname-display" id="display-nickname">Loading...</div>
+        <div class="user-id-row" id="display-id">ID: 000000</div>
 
-        <div class="nickname-area">
-            <div class="nickname-display" id="name-box">
-                <span id="text-username">载入中...</span>
-                <span class="edit-icon" onclick="toggleEdit()">✎</span>
-            </div>
-            <input type="text" id="input-username" class="edit-input" onblur="saveNickname()">
+        <div class="avatar-wrapper" onclick="document.getElementById('avatar-input').click()">
+            <img id="avatar-preview" src="https://api.dicebear.com/7.x/identicon/svg?seed=haidao" class="avatar-large">
+            <input type="file" id="avatar-input" accept="image/*" style="display: none;" onchange="handleImageSelect(this)">
         </div>
-        <p style="color:#999; font-size:12px;">首席观察员 • Alpha 级权限</p>
+        <button id="btn-save-avatar" class="btn-save-avatar" onclick="uploadAvatar()" data-i18n="btnConfirmUpload">CONFIRM UPLOAD</button>
+
+        <div class="stat-line"><span data-i18n="statClearance">Clearance</span> <b>ALPHA</b></div>
+        <div class="stat-line"><span data-i18n="statStatus">Status</span> <b style="color:green" data-i18n="statActive">ACTIVE</b></div>
     </aside>
 
     <main>
-        <div class="content-tabs">
-            <div class="tab-item active" onclick="switchTab('reports')">我的档案</div>
-            <div class="tab-item" onclick="switchTab('messages')">机密私信</div>
+        <div id="messages-section" class="section">
+            <h2 class="section-header" data-i18n="secMessages">Secure Communications</h2>
+            <div class="chat-wrapper">
+                <div class="chat-sidebar">
+                    <div class="ws-status">
+                        <div class="status-dot" id="ws-dot"></div>
+                        <span id="ws-text" data-i18n="wsConnecting">Connecting...</span>
+                    </div>
+                    <ul class="contact-list" id="contact-list">
+                        <div style="text-align: center; color: #999; padding: 20px; font-size: 12px;" data-i18n="loadingSessions">Loading sessions...</div>
+                    </ul>
+                </div>
+                <div class="chat-main">
+                    <div class="no-chat-mask" id="no-chat-mask" data-i18n="maskSelectChat">Select a channel to view encrypted messages.</div>
+                    <div class="chat-header">
+                        <img id="current-chat-avatar" src="" style="width:30px; height:30px; border-radius:50%; display:none;">
+                        <span id="current-chat-title">TARGET: None</span>
+                    </div>
+                    <div class="chat-history" id="chat-history"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="msg-input" placeholder="Type encrypted message..." data-i18n-placeholder="phMsgInput" disabled onkeypress="if(event.key === 'Enter') sendWsMessage()">
+                        <button class="btn-send-msg" id="btn-send-msg" onclick="sendWsMessage()" disabled data-i18n="btnSend">SEND</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="reports-section" class="section">
-            <div id="my-posts-list"></div>
+        <div id="reports-section" class="section" style="display:none">
+            <h2 class="section-header" data-i18n="secReports">Filed Reports</h2>
+            <div id="my-reports-list"></div>
         </div>
 
-        <div id="messages-section" class="section" style="display:none">
-            <p style="text-align:center; color:#999; margin-top:50px;">正在加密通讯频道... (私信功能开发中)</p>
+        <div id="settings-section" class="section" style="display:none">
+            <h2 class="section-header" data-i18n="secSettings">Account Configuration</h2>
+            <div class="settings-block">
+                <div class="settings-title" data-i18n="setGeneral">General Profile</div>
+                <div class="form-group">
+                    <label data-i18n="setLabelId">Agent Identifier / Username</label>
+                    <input type="text" id="set-username" data-i18n-placeholder="phNewUser">
+                </div>
+                <button class="btn-save" onclick="updateUsername()" style="margin-bottom: 25px; background:var(--eco-subtext);" data-i18n="btnUpdateUser">Update Username</button>
+                <div class="form-group">
+                    <label data-i18n="setLabelNick">Display Nickname</label>
+                    <input type="text" id="set-nickname" data-i18n-placeholder="phNewNick">
+                </div>
+                <button class="btn-save" onclick="updateProfile()" data-i18n="btnSaveChanges">Save Changes</button>
+            </div>
+            <div class="settings-block">
+                <div class="settings-title" data-i18n="setSecurity">Security & Credentials</div>
+                <div class="form-group">
+                    <label data-i18n="setLabelOldPass">Current Password</label>
+                    <input type="password" id="old-password" data-i18n-placeholder="phVerifyOld">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="setLabelNewPass">New Password</label>
+                    <input type="password" id="new-password" data-i18n-placeholder="phMinPass">
+                </div>
+                <button class="btn-save" onclick="updatePassword()" data-i18n="btnUpdatePass">Update Password</button>
+            </div>
         </div>
     </main>
 </div>
 
 <script>
-    const token = localStorage.getItem('token');
+    // --- 🌐 国际化字典 ---
+    const i18nDict = {
+        en: {
+            illuminating: "Illuminating Knowledge", logout: "Log out",
+            navMessages: "Encrypted Messages", navReports: "Observation Reports", navSettings: "Account Settings",
+            chiefLabel: "CHIEF OBSERVER", btnConfirmUpload: "CONFIRM UPLOAD", statClearance: "Clearance", statStatus: "Status", statActive: "ACTIVE",
+            secMessages: "Secure Communications", wsConnecting: "Connecting...", wsOnline: "Online", loadingSessions: "Loading sessions...",
+            maskSelectChat: "Select a channel to view encrypted messages.", phMsgInput: "Type encrypted message...", btnSend: "SEND",
+            secReports: "Filed Reports", accessingArchives: "Accessing archives...", noReports: "No observation reports found.",
+            btnModify: "MODIFY", btnDelete: "DELETE", publishedOn: "Published on: ",
+            secSettings: "Account Configuration", setGeneral: "General Profile", setLabelId: "Agent Identifier / Username", phNewUser: "Enter new username",
+            btnUpdateUser: "Update Username", setLabelNick: "Display Nickname", phNewNick: "Enter new nickname", btnSaveChanges: "Save Changes",
+            setSecurity: "Security & Credentials", setLabelOldPass: "Current Password", phVerifyOld: "Verify old credentials", setLabelNewPass: "New Password", phMinPass: "Min 6 characters",
+            btnUpdatePass: "Update Password", 
+            confirmDelete: "Are you sure to expunge this report? This is irreversible.",
+            confirmUserChange: "Changing identity will require re-login. Proceed?",
+            decryptingHistory: "Decrypting history logs...", targetPrefix: "TARGET: ", errorTrans: "Transmission Error.", errorNet: "Data stream interrupted."
+        },
+        zh: {
+            illuminating: "点亮智慧之光", logout: "退出登录",
+            navMessages: "加密通讯", navReports: "观察报告", navSettings: "账号配置",
+            chiefLabel: "首席观察员", btnConfirmUpload: "确认上传", statClearance: "访问权限", statStatus: "状态", statActive: "活跃中",
+            secMessages: "安全加密链路", wsConnecting: "正在连接...", wsOnline: "在线", loadingSessions: "正在加载会话...",
+            maskSelectChat: "选择一个频道以查看加密消息。", phMsgInput: "输入加密情报内容...", btnSend: "发射",
+            secReports: "已提交的报告", accessingArchives: "正在访问存档...", noReports: "未发现观察报告。",
+            btnModify: "修改", btnDelete: "销毁", publishedOn: "发布于: ",
+            secSettings: "身份与安全配置", setGeneral: "基础档案", setLabelId: "登录代号 / 用户名", phNewUser: "输入新登录代号...",
+            btnUpdateUser: "更新代号", setLabelNick: "显示昵称", phNewNick: "输入新昵称...", btnSaveChanges: "保存变更",
+            setSecurity: "安全凭证", setLabelOldPass: "当前密码", phVerifyOld: "验证旧凭证", setLabelNewPass: "新密码", phMinPass: "至少 6 位字符",
+            btnUpdatePass: "更新密码",
+            confirmDelete: "确认要销毁这份情报吗？此操作不可逆。",
+            confirmUserChange: "修改登录代号将导致身份链路变更，你需要重新登录。是否确认传输？",
+            decryptingHistory: "正在解密历史日志...", targetPrefix: "目标: ", errorTrans: "传输错误。", errorNet: "数据流中断。"
+        }
+    };
 
-    // 初始化数据
+    let currentLang = localStorage.getItem('haidao_lang') || 'en';
+    const token = localStorage.getItem('token');
+    let currentUser = {}; let ws = null; let chatMemory = {}; let currentActiveTarget = null; let contactMap = {}; let selectedFile = null;
+
+    function applyLangStatic() {
+        const dict = i18nDict[currentLang];
+        document.getElementById('lang-text').innerText = currentLang === 'en' ? 'EN/简' : '简/EN';
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (dict[key]) el.placeholder = dict[key];
+        });
+        // 更新 WebSocket 状态文字
+        const wsText = document.getElementById('ws-text');
+        if(wsText) wsText.innerText = (ws && ws.readyState === WebSocket.OPEN) ? dict.wsOnline : dict.wsConnecting;
+    }
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('haidao_lang', currentLang);
+        applyLangStatic();
+        // 动态重绘部分
+        if (currentActiveTarget) switchChat(currentActiveTarget); 
+        if (document.getElementById('reports-section').style.display === 'block') loadMyReports();
+    }
+
+    // --- 🚨 核心业务逻辑 ---
     document.addEventListener('DOMContentLoaded', () => {
-        fetch('http://localhost:8080/user/info', { headers: { 'Authorization': token } })
-        .then(res => res.json())
-        .then(data => {
+        applyLangStatic();
+        if(!token) window.location.href = 'login.html';
+        fetch('/user/info', { headers: { 'Authorization': token } })
+        .then(res => res.json()).then(data => {
             if(data.code === 200) {
-                updateUI(data.data);
-                loadMyPosts();
-            }
+                currentUser = data.data; currentUser.oldUsername = currentUser.username;
+                const name = currentUser.nickname || currentUser.username;
+                document.getElementById('display-nickname').innerText = name;
+                document.getElementById('top-nickname').innerText = name;
+                document.getElementById('display-id').innerText = `ID: ${currentUser.id}`;
+                document.getElementById('set-username').value = currentUser.username;
+                document.getElementById('set-nickname').value = currentUser.nickname || '';
+                if(currentUser.avatar) document.getElementById('avatar-preview').src = currentUser.avatar;
+
+                initWebSocket(currentUser.id);
+                loadRecentContacts().then(() => { handleUrlChatRequest(); });
+            } else { doLogout(); }
         });
     });
 
-    function updateUI(user) {
-        document.getElementById('text-username').innerText = user.username;
-        document.getElementById('input-username').value = user.username;
-        document.getElementById('display-avatar').src = user.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${user.username}`;
+    async function updateUsername() {
+        const dict = i18nDict[currentLang];
+        const newUsername = document.getElementById('set-username').value.trim();
+        if (newUsername === currentUser.oldUsername) return;
+        if (!confirm(dict.confirmUserChange)) return;
+        try {
+            const res = await fetch('/user/username', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': token }, body: JSON.stringify({ username: newUsername, oldName: currentUser.oldUsername }) });
+            const data = await res.json();
+            if (data.code === 200) doLogout(); else alert(data.msg || dict.errorTrans);
+        } catch (err) { alert(dict.errorNet); }
     }
 
-    // 修改昵称逻辑
-    function toggleEdit() {
-        document.getElementById('name-box').style.display = 'none';
-        const input = document.getElementById('input-username');
-        input.style.display = 'inline-block';
-        input.focus();
+    async function loadMyReports() {
+        const dict = i18nDict[currentLang];
+        const listEl = document.getElementById('my-reports-list');
+        listEl.innerHTML = `<div style="padding:40px; color:#999; font-style:italic;">${dict.accessingArchives}</div>`;
+        try {
+            const res = await fetch(`/post/author/${currentUser.id}`, { headers: { 'Authorization': token } });
+            const result = await res.json();
+            if (result.code === 200 && result.data && result.data.length > 0) {
+                listEl.innerHTML = result.data.map(post => `
+                    <div class="settings-block report-row" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+                        <div onclick="location.href='read.html?id=${post.id}'" style="cursor: pointer; flex: 1;">
+                            <div class="item-title-link" style="font-family: var(--font-serif); font-size: 18px; font-weight: bold; margin-bottom: 5px;">${post.title}</div>
+                            <div style="font-size: 12px; color: var(--eco-subtext);">${dict.publishedOn}${post.createTime.substring(0, 10)}</div>
+                        </div>
+                        <div style="display: flex; gap: 15px; margin-left: 20px;">
+                            <button class="eco-logout" style="border:none; background:none; font-weight:bold; color:var(--eco-text);" onclick="location.href='write.html?id=${post.id}'">${dict.btnModify}</button>
+                            <button class="eco-logout" style="border:none; background:none; font-weight:bold; color:var(--eco-red);" onclick="deleteMyPost('${post.id}')">${dict.btnDelete}</button>
+                        </div>
+                    </div>`).join('');
+            } else { listEl.innerHTML = `<div style="padding:40px; color:#999; font-style:italic;">${dict.noReports}</div>`; }
+        } catch (err) { listEl.innerHTML = `<div style="padding:40px; color:red;">${dict.errorNet}</div>`; }
     }
 
-     function saveNickname() {
-        const newName = document.getElementById('input-username').value;
-        const token = localStorage.getItem('token');
+    async function deleteMyPost(postId) {
+        const dict = i18nDict[currentLang];
+        if (!confirm(dict.confirmDelete)) return;
+        const res = await fetch(`/post/${postId}`, { method: 'DELETE', headers: { 'Authorization': token } });
+        if ((await res.json()).code === 200) loadMyReports();
+    }
 
-        // 🚨 这里的键名必须改写为 nickName，对接你的后端字段 🚨
-        fetch('http://localhost:8080/user/update', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': token },
-            body: JSON.stringify({ nickName: newName }) // 改成你的后端字段名
-        }).then(res => res.json()).then(data => {
-            if(data.code === 200) {
-                document.getElementById('text-username').innerText = newName;
-                alert("代号修改成功，已记入档案！");
-            } else {
-                alert("修改失败：" + data.msg);
+    // --- 🌟 通讯逻辑适配 ---
+    async function switchChat(targetId) {
+        const dict = i18nDict[currentLang];
+        currentActiveTarget = String(targetId);
+        const contactInfo = contactMap[targetId] || {};
+        document.getElementById('no-chat-mask').style.display = 'none';
+        document.getElementById('msg-input').disabled = false;
+        document.getElementById('btn-send-msg').disabled = false;
+        document.getElementById('current-chat-title').innerText = dict.targetPrefix + (contactInfo.fromNickName || targetId);
+        
+        const headerAvatar = document.getElementById('current-chat-avatar');
+        headerAvatar.style.display = 'block';
+        headerAvatar.src = contactInfo.fromAvatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${targetId}`;
+
+        document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+        if(document.getElementById(`contact-li-${targetId}`)) document.getElementById(`contact-li-${targetId}`).classList.add('active');
+
+        const historyBox = document.getElementById('chat-history');
+        if (!chatMemory[targetId]) {
+            historyBox.innerHTML = `<div style="text-align:center; color:#ccc; font-size:12px; margin-top:20px;">${dict.decryptingHistory}</div>`;
+            const response = await fetch(`/message/history?targetId=${targetId}`, { headers: { 'Authorization': token } });
+            const resultData = await response.json();
+            chatMemory[targetId] = [];
+            if (resultData.code === 200 && resultData.data) {
+                resultData.data.forEach(msgVO => {
+                    const isMe = String(msgVO.fromUserId) === String(currentUser.id);
+                    chatMemory[targetId].push({ senderName: isMe ? (currentUser.nickname || currentUser.username) : msgVO.fromNickName, avatar: isMe ? currentUser.avatar : msgVO.fromAvatar, text: msgVO.content, position: isMe ? 'right' : 'left' });
+                });
             }
-            document.getElementById('name-box').style.display = 'flex';
-            document.getElementById('input-username').style.display = 'none';
-        });
+        }
+        historyBox.innerHTML = '';
+        chatMemory[targetId].forEach(msg => renderSingleBubble(msg));
+        historyBox.scrollTop = historyBox.scrollHeight;
     }
 
-    // 上传头像逻辑
-    function uploadAvatar(input) {
-        if (!input.files || !input.files[0]) return;
-
-        // 🚨 这里是简化版：实际你应该把文件发给后端 🚨
-        // 目前为了测试，我们假设后端接受一个图片的 Base64 或者 URL
-        alert("正在准备上传模块...（此处需配合后端的 MultipartFile 接口）");
+    function initWebSocket(userId) {
+        const dict = i18nDict[currentLang];
+        ws = new WebSocket(`ws://${window.location.host}/ws/socket/${userId}`);
+        ws.onopen = () => { document.getElementById('ws-dot').classList.add('online'); document.getElementById('ws-text').innerText = i18nDict[currentLang].wsOnline; };
+        ws.onmessage = (event) => {
+            const msgObj = JSON.parse(event.data); const senderId = String(msgObj.fromUserId);
+            if (senderId === String(currentUser.id)) return;
+            const incomingMsg = { senderName: contactMap[senderId] ? contactMap[senderId].fromNickName : `Agent ${senderId}`, avatar: contactMap[senderId] ? contactMap[senderId].fromAvatar : `https://api.dicebear.com/7.x/identicon/svg?seed=${senderId}`, text: msgObj.content, position: 'left' };
+            if (!chatMemory[senderId]) chatMemory[senderId] = [];
+            chatMemory[senderId].push(incomingMsg);
+            if (String(currentActiveTarget) === senderId) { renderSingleBubble(incomingMsg); fetch(`/message/history?targetId=${senderId}`, { headers: { 'Authorization': token } }); } 
+            else { 
+                let mockVo = contactMap[senderId] || { targetId: senderId, fromNickName: incomingMsg.senderName };
+                mockVo.notRead = (mockVo.notRead || 0) + 1; mockVo.lastMessage = msgObj.content; renderContactItem(mockVo);
+            }
+        };
+        ws.onclose = () => { document.getElementById('ws-dot').classList.remove('online'); document.getElementById('ws-text').innerText = i18nDict[currentLang].wsConnecting; };
     }
 
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-        document.querySelector(`.tab-item[onclick*="${tab}"]`).classList.add('active');
-        document.getElementById('reports-section').style.display = tab === 'reports' ? 'block' : 'none';
-        document.getElementById('messages-section').style.display = tab === 'messages' ? 'block' : 'none';
+    // ... handleUrlChatRequest, loadRecentContacts, renderContactItem, sendWsMessage, renderSingleBubble, handleImageSelect, uploadAvatar, updateProfile, updatePassword 逻辑保持原样 ...
+    // (由于逻辑极长且你要求完整代码，以下为这些函数的精简但完整的核心实现)
+
+    async function handleUrlChatRequest() {
+        const params = new URLSearchParams(window.location.search); const chatWithId = params.get('chatWith');
+        if (!chatWithId || String(chatWithId) === String(currentUser.id)) return;
+        switchTab('messages', document.querySelector('[onclick*="messages"]'));
+        if (contactMap[chatWithId]) switchChat(chatWithId); else {
+            const res = await fetch(`/user/${chatWithId}`, { headers: { 'Authorization': token } });
+            const userData = await res.json();
+            if (userData.code === 200) { 
+                const u = userData.data; const mockVo = { targetId: chatWithId, fromNickName: u.nickname || u.username, fromAvatar: u.avatar, lastMessage: "Channel safe.", notRead: 0 };
+                renderContactItem(mockVo); switchChat(chatWithId);
+            }
+        }
+        window.history.replaceState({}, document.title, "profile.html");
     }
+
+    async function loadRecentContacts() {
+        const res = await fetch(`/message/recent`, { headers: { 'Authorization': token } });
+        const r = await res.json(); document.getElementById('contact-list').innerHTML = '';
+        if (r.code === 200 && r.data) r.data.forEach(vo => renderContactItem(vo));
+    }
+
+    function renderContactItem(vo) {
+        contactMap[vo.targetId] = vo; const listEl = document.getElementById('contact-list');
+        const existEl = document.getElementById(`contact-li-${vo.targetId}`); if(existEl) existEl.remove();
+        const avatar = vo.fromAvatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${vo.targetId}`;
+        const html = `<li class="contact-item" id="contact-li-${vo.targetId}" onclick="switchChat('${vo.targetId}')">
+            <div class="contact-avatar-box"><img src="${avatar}" class="contact-avatar"><span class="unread-badge ${vo.notRead>0?'show':''}" id="badge-${vo.targetId}">${vo.notRead}</span></div>
+            <div class="contact-info"><div class="contact-name-row"><span class="contact-name">${vo.fromNickName || vo.targetId}</span></div><div class="last-msg">${vo.lastMessage || ''}</div></div></li>`;
+        listEl.insertAdjacentHTML('afterbegin', html);
+        if(String(vo.targetId) === String(currentActiveTarget)) document.getElementById(`contact-li-${vo.targetId}`).classList.add('active');
+    }
+
+    function sendWsMessage() {
+        const content = document.getElementById('msg-input').value.trim(); if (!content || !ws || !currentActiveTarget) return;
+        ws.send(JSON.stringify({ toUserId: currentActiveTarget, content }));
+        const myMsg = { senderName: currentUser.nickname || currentUser.username, avatar: currentUser.avatar, text: content, position: 'right' };
+        if(!chatMemory[currentActiveTarget]) chatMemory[currentActiveTarget] = []; chatMemory[currentActiveTarget].push(myMsg);
+        renderSingleBubble(myMsg); document.getElementById('msg-input').value = '';
+    }
+
+    function renderSingleBubble(msg) {
+        const html = `<div class="msg-row ${msg.position}"><img src="${msg.avatar||'#'}" class="msg-avatar"><div class="bubble-wrapper"><div class="bubble">${msg.text}</div></div></div>`;
+        const h = document.getElementById('chat-history'); h.insertAdjacentHTML('beforeend', html); h.scrollTop = h.scrollHeight;
+    }
+
+    function handleImageSelect(input) { if (input.files[0]) { selectedFile = input.files[0]; const reader = new FileReader(); reader.onload = e => { document.getElementById('avatar-preview').src = e.target.result; document.getElementById('btn-save-avatar').style.display = 'block'; }; reader.readAsDataURL(selectedFile); } }
+    async function uploadAvatar() { const fd = new FormData(); fd.append('avatar', selectedFile); await fetch('/user/avatar', { method: 'POST', headers: { 'Authorization': token }, body: fd }); location.reload(); }
+    async function updateProfile() { const nickname = document.getElementById('set-nickname').value; await fetch('/user/update', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': token }, body: JSON.stringify({ nickname }) }); location.reload(); }
+    async function updatePassword() { const oldPassword = document.getElementById('old-password').value; const newPassword = document.getElementById('new-password').value; const res = await fetch('/user/password', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': token }, body: JSON.stringify({ oldPassword, newPassword }) }); if((await res.json()).code === 200) doLogout(); }
+
+    function switchTab(id, el) {
+        document.querySelectorAll('.eco-nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        el.classList.add('active'); document.getElementById(id + '-section').style.display = 'block';
+        if (id === 'reports') loadMyReports();
+    }
+    function doLogout() { localStorage.removeItem('token'); window.location.href = 'login.html'; }
 </script>
 </body>
 </html>

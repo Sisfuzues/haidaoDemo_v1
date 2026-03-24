@@ -2,74 +2,213 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>海岛观察站 - 发布情报</title>
+    <title>Write - The Candle | Illuminating Knowledge</title>
     <style>
-        body { font-family: sans-serif; background: #eceff1; padding: 50px; }
-        .container { background: white; padding: 30px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        input, textarea { width: 95%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #c82333; }
-        .token-info { font-size: 12px; color: gray; word-break: break-all; margin-bottom: 20px; }
+        :root {
+            --eco-red: #e3120b;
+            --eco-navy: #0F2D52;
+            --eco-text: #1a1a1a;
+            --eco-border: #d9d9d9;
+            --eco-subtext: #5f6368;
+            --bg-body: #fdfcf8;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body { margin: 0; padding: 0; background: var(--bg-body); font-family: var(--font-sans); color: var(--eco-text); }
+
+        /* 🎩 顶部报头 (保持全站统一) */
+        .header-wrapper { background: #fff; border-bottom: 2px solid var(--eco-navy); }
+        .masthead { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; max-width: 1300px; margin: 0 auto; }
+
+        .brand-container { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+        .logo-img { width: 52px; height: 52px; border-radius: 6px; object-fit: cover; }
+        .brand-name { font-family: var(--font-serif); font-size: 30px; font-weight: bold; color: var(--eco-navy); line-height: 1; display: flex; flex-direction: column; }
+        .brand-name small { font-size: 12px; font-weight: normal; font-family: var(--font-sans); text-transform: uppercase; color: var(--eco-subtext); margin-top: 4px; letter-spacing: 1px;}
+
+        .masthead-right { display: flex; align-items: center; gap: 25px; }
+        .lang-toggle-btn { cursor: pointer; color: var(--eco-navy); display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: bold; user-select: none; }
+        .lang-toggle-btn:hover { color: var(--eco-red); }
+
+        .eco-user-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: bold; border-left: 1px solid var(--eco-border); padding-left: 25px; }
+        .user-avatar-top { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+
+        /* 📝 撰写表单布局 */
+        .write-container { max-width: 800px; margin: 60px auto 100px; padding: 0 20px; }
+        .editor-card { background: #fff; padding: 40px; border-radius: 8px; border: 1px solid var(--eco-border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-label { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--eco-navy); margin-bottom: 8px; letter-spacing: 0.5px; }
+        
+        input[type="text"], select, textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--eco-border); border-radius: 4px;
+            font-size: 16px; font-family: var(--font-sans); box-sizing: border-box; transition: 0.2s; background: #fafafa;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--eco-navy); background: #fff; box-shadow: 0 0 0 3px rgba(15, 45, 82, 0.05); }
+
+        .title-input { font-family: var(--font-serif); font-size: 32px; font-weight: bold; border: none; border-bottom: 2px solid #eee; background: transparent !important; padding: 10px 0; border-radius: 0; }
+        .title-input:focus { border-bottom-color: var(--eco-red); box-shadow: none; }
+
+        .publish-btn-row { display: flex; justify-content: flex-end; gap: 15px; margin-top: 40px; }
+        .btn { padding: 12px 30px; border-radius: 4px; font-weight: bold; cursor: pointer; border: none; font-size: 15px; transition: 0.3s; }
+        .btn-primary { background: var(--eco-navy); color: #fff; }
+        .btn-primary:hover { background: var(--eco-red); transform: translateY(-2px); }
+        .btn-secondary { background: #eee; color: var(--eco-subtext); }
+
+        .status-msg { font-size: 14px; margin-top: 15px; text-align: right; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h2>📡 发布最新观察情报</h2>
 
-    <div class="token-info" id="tokenDisplay">正在检查通行证...</div>
+<div class="header-wrapper">
+    <header class="masthead">
+        <a href="index.html" class="brand-container">
+            <img src="/logo.jpg" alt="Logo" class="logo-img">
+            <div class="brand-name">
+                The Candle
+                <small data-i18n="illuminating">Illuminating Knowledge</small>
+            </div>
+        </a>
 
-    <input type="text" id="title" placeholder="情报标题">
-    <textarea id="content" rows="6" placeholder="情报正文内容..."></textarea>
-    <button onclick="doPublish()">发射情报</button>
-    <button onclick="logout()" style="background: #6c757d; margin-left: 10px;">销毁证件退出</button>
+        <div class="masthead-right">
+            <span class="lang-toggle-btn" onclick="toggleLang()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span id="lang-text">EN/简</span>
+            </span>
+            <div class="eco-user-actions">
+                <img id="current-avatar" src="" class="user-avatar-top">
+                <span id="current-username" style="color:var(--eco-navy)">Agent</span>
+            </div>
+        </div>
+    </header>
 </div>
 
+<main class="write-container">
+    <div class="editor-card">
+        <div class="form-group">
+            <input type="text" id="title" class="title-input" placeholder="Enter dispatch title..." data-i18n-placeholder="phTitle">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" data-i18n="labelCategory">Category</label>
+            <select id="category">
+                <option value="Weekly edition">Weekly edition</option>
+                <option value="Economics">Economics</option>
+                <option value="Politics">Politics</option>
+                <option value="International Affairs">International Affairs</option>
+                <option value="Technology">Technology</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" data-i18n="labelHeroImg">Hero Image URL (Optional)</label>
+            <input type="text" id="imageUrl" placeholder="https://example.com/cover.jpg" data-i18n-placeholder="phHeroImg">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" data-i18n="labelContent">Intelligence Content</label>
+            <textarea id="content" rows="12" placeholder="Write your analysis here..." data-i18n-placeholder="phContent"></textarea>
+        </div>
+
+        <div class="publish-btn-row">
+            <button class="btn btn-secondary" onclick="location.href='index.html'" data-i18n="btnCancel">Cancel</button>
+            <button class="btn btn-primary" onclick="doPublish()" data-i18n="btnLaunch">Launch Intelligence</button>
+        </div>
+        <div id="status" class="status-msg"></div>
+    </div>
+</main>
+
 <script>
-    // 页面一加载，先去保险柜里拿 Token
-    const token = localStorage.getItem('haidao_token');
+    // --- 🌐 国际化字典 ---
+    const i18nDict = {
+        en: {
+            illuminating: "Illuminating Knowledge", labelCategory: "Category", labelHeroImg: "Hero Image URL (Optional)",
+            labelContent: "Intelligence Content", btnCancel: "Cancel", btnLaunch: "Launch Intelligence",
+            phTitle: "Enter dispatch title...", phHeroImg: "https://example.com/cover.jpg", phContent: "Write your analysis here...",
+            launching: "Launching...", success: "Intelligence launched successfully!", fail: "Launch failed.", noToken: "No pass detected. Redirecting to login..."
+        },
+        zh: {
+            illuminating: "点亮智慧之光", labelCategory: "情报领域", labelHeroImg: "封面图片链接 (可选)",
+            labelContent: "情报正文内容", btnCancel: "取消", btnLaunch: "发射情报",
+            phTitle: "输入情报标题...", phHeroImg: "请输入图片URL地址...", phContent: "在此输入你的观察与深度分析...",
+            launching: "正在发射...", success: "情报发射成功！", fail: "发射失败，请重试。", noToken: "未检测到通行证，正在返回登录页..."
+        }
+    };
 
-    if(!token) {
-        alert('你没有通行证，请先登录！');
-        window.location.href = 'login.html';
-    } else {
-        document.getElementById('tokenDisplay').innerText = "当前持有通行证: " + token.substring(0, 30) + "...";
-    }
+    let currentLang = localStorage.getItem('haidao_lang') || 'en';
+    const token = localStorage.getItem('token'); // 统一使用 token
 
-    function doPublish() {
-        // 战友，把这里的 URL 换成你实际的发帖接口路径！
-        const targetUrl = 'http://localhost:8080/post/add';
-
-        const postTitle = document.getElementById('title').value;
-        const postContent = document.getElementById('content').value;
-
-        fetch(targetUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // 【核心突防动作】把 Token 挂在请求头上过安检！
-                'Authorization': token
-            },
-            body: JSON.stringify({ title: postTitle, content: postContent })
-        })
-        .then(res => {
-            // 如果拦截器拦截了，会返回 401
-            if(res.status === 401) {
-                throw new Error("通行证假冒或已过期，被哨兵拦截！");
-            }
-            return res.json();
-        })
-        .then(data => {
-            alert('情报发射成功！后端返回: ' + JSON.stringify(data));
-        })
-        .catch(error => {
-            alert(error.message);
-            window.location.href = 'login.html'; // 赶回登录页
+    function applyLangStatic() {
+        const dict = i18nDict[currentLang];
+        document.getElementById('lang-text').innerText = currentLang === 'en' ? 'EN/简' : '简/EN';
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (dict[key]) el.innerText = dict[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (dict[key]) el.placeholder = dict[key];
         });
     }
 
-    function logout() {
-        localStorage.removeItem('haidao_token'); // 撕毁证件
-        window.location.href = 'login.html';
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'zh' : 'en';
+        localStorage.setItem('haidao_lang', currentLang);
+        applyLangStatic();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        applyLangStatic();
+        if(!token) {
+            alert(i18nDict[currentLang].noToken);
+            window.location.href = 'login.html';
+            return;
+        }
+
+        fetch('/user/info', { headers: { 'Authorization': token } })
+        .then(res => res.json()).then(data => {
+            if(data.code === 200) {
+                document.getElementById('current-username').innerText = data.data.nickname || data.data.username;
+                document.getElementById('current-avatar').src = data.data.avatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${data.data.username}`;
+            }
+        });
+    });
+
+    function doPublish() {
+        const dict = i18nDict[currentLang];
+        const status = document.getElementById('status');
+        const title = document.getElementById('title').value.trim();
+        const content = document.getElementById('content').value.trim();
+        const category = document.getElementById('category').value;
+        const imageUrl = document.getElementById('imageUrl').value.trim();
+
+        if(!title || !content) {
+            alert(currentLang === 'en' ? "Please fill in title and content." : "请填写标题和内容。");
+            return;
+        }
+
+        status.innerText = dict.launching;
+        status.style.color = "var(--eco-navy)";
+
+        fetch('/post/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': token },
+            body: JSON.stringify({ title, content, category, imageUrl })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.code === 200) {
+                status.innerText = dict.success;
+                status.style.color = "green";
+                setTimeout(() => window.location.href = 'index.html', 1500);
+            } else {
+                throw new Error(data.msg);
+            }
+        })
+        .catch(err => {
+            status.innerText = dict.fail + " (" + err.message + ")";
+            status.style.color = "var(--eco-red)";
+        });
     }
 </script>
 </body>

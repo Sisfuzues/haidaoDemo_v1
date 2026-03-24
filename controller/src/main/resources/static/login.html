@@ -2,91 +2,68 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>海岛观察站 - 身份验证</title>
+  <title>The Candle - 身份验证</title>
   <style>
-    /* 极简灰白背景，突出中央卡片 */
-    body {
-        font-family: 'Helvetica Neue', Arial, sans-serif;
-        background-color: #f7f8fa;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
-    .auth-card {
-        background: white;
-        padding: 40px;
-        border-radius: 8px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-        width: 320px;
-        text-align: center;
-        /* 顶部那一抹经典的红线 */
-        border-top: 4px solid #d32f2f;
-    }
-    .brand-title {
-        font-family: 'Georgia', serif; /* 经典的衬线报纸体 */
-        color: #111;
-        margin-bottom: 5px;
-        font-size: 24px;
-    }
-    .brand-subtitle {
-        font-size: 12px;
-        color: #888;
-        margin-bottom: 30px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #fdfcf8; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .auth-card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); width: 320px; text-align: center; border-top: 4px solid #e3120b; }
+
+    /* 🌟 全新品牌视觉 */
+    .brand-logo { width: 64px; height: 64px; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(227,18,11,0.15); object-fit: cover; }
+    .brand-title { font-family: 'Georgia', serif; color: #0F2D52; margin: 0 0 5px 0; font-size: 26px; font-weight: bold; letter-spacing: 0.5px;}
+    .brand-subtitle { font-size: 11px; color: #888; margin-bottom: 25px; letter-spacing: 1px; text-transform: uppercase; font-weight: bold; }
+
+    .tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eaeaea; }
+    .tab { flex: 1; padding: 10px 0; cursor: pointer; font-size: 13px; color: #888; transition: all 0.3s; }
+    .tab.active { color: #e3120b; border-bottom: 2px solid #e3120b; font-weight: bold; }
+    .form-section { display: none; text-align: left; }
+    .form-section.active { display: block; }
     .input-group { margin-bottom: 15px; }
-    input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px;
-        border: 1px solid #eaeaea;
-        border-radius: 4px;
-        font-size: 14px;
-        background: #fafafa;
-        transition: all 0.3s ease;
-    }
-    input:focus {
-        border-color: #d32f2f;
-        outline: none;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
-    }
-    button {
-        width: 100%;
-        padding: 12px;
-        background: #d32f2f;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background 0.3s;
-        font-family: 'Georgia', serif;
-        margin-top: 10px;
-    }
-    button:hover { background: #b71c1c; }
-    .footer-links { margin-top: 25px; font-size: 13px; }
+    .code-group { display: flex; gap: 10px; }
+    .code-group input { flex: 1; }
+    .btn-send { width: 110px; margin-top: 0; padding: 0; font-size: 12px; background: #0F2D52; }
+    .btn-send:hover { background: #0a1f3a; }
+    .btn-send:disabled { background: #ccc; cursor: not-allowed; }
+    input { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #eaeaea; border-radius: 4px; font-size: 14px; background: #fafafa; transition: all 0.3s ease; }
+    input:focus { border-color: #0F2D52; outline: none; background: white; box-shadow: 0 0 0 3px rgba(15,45,82, 0.1); }
+    button { width: 100%; padding: 12px; background: #e3120b; color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: bold; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+    button:hover:not(:disabled) { background: #c8100a; }
+    .footer-links { margin-top: 25px; font-size: 13px; text-align: center; }
     .footer-links a { color: #666; text-decoration: none; transition: color 0.3s; }
-    .footer-links a:hover { color: #d32f2f; }
+    .footer-links a:hover { color: #e3120b; }
   </style>
 </head>
 <body>
 
 <div class="auth-card">
-  <h2 class="brand-title">THE HAIDAO POST</h2>
+  <img src="/logo.jpg" alt="The Candle Logo" class="brand-logo">
+  <h2 class="brand-title">The Candle</h2>
   <div class="brand-subtitle">Observer Authentication</div>
 
-  <div class="input-group">
-    <input type="text" id="username" placeholder="输入用户名 / Username">
-  </div>
-  <div class="input-group">
-    <input type="password" id="password" placeholder="输入密码 / Password">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('pwd')">密码核验</div>
+    <div class="tab" onclick="switchTab('email')">邮箱直连</div>
   </div>
 
-  <button onclick="doLogin()">立即验证</button>
+  <div id="pwd-form" class="form-section active">
+    <div class="input-group">
+      <input type="text" id="username" placeholder="输入代号 / Username">
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="输入密令 / Password">
+    </div>
+    <button onclick="doPwdLogin()">验证身份 (Verify)</button>
+  </div>
+
+  <div id="email-form" class="form-section">
+    <div class="input-group">
+      <input type="email" id="email" placeholder="输入邮箱地址 / Email">
+    </div>
+    <div class="input-group code-group">
+      <input type="text" id="code" placeholder="6位验证码">
+      <button id="btnSendCode" class="btn-send" onclick="sendCode()">获取验证码</button>
+    </div>
+    <button onclick="doEmailLogin()">验证并登录</button>
+  </div>
 
   <div class="footer-links">
     <p><a href="register.html">新用户注册 (Register)</a></p>
@@ -94,30 +71,116 @@
 </div>
 
 <script>
-  function doLogin() {
+  // --- UI 逻辑：选项卡切换 ---
+  function switchTab(type) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+
+      if(type === 'pwd') {
+          document.querySelectorAll('.tab')[0].classList.add('active');
+          document.getElementById('pwd-form').classList.add('active');
+      } else {
+          document.querySelectorAll('.tab')[1].classList.add('active');
+          document.getElementById('email-form').classList.add('active');
+      }
+  }
+
+  // --- 业务逻辑 1：密码登录 ---
+  function doPwdLogin() {
       const user = document.getElementById('username').value;
       const pass = document.getElementById('password').value;
 
-      fetch('http://localhost:8080/user/login', {
+      fetch('/user/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: user, password: pass })
       })
       .then(res => res.json())
-      .then(data => {
-          if(data.code === 200) {
-              // 存入 JWT 令牌
-              localStorage.setItem('token', data.data);
-              alert('身份核实完毕，即将转入主页面！');
-              window.location.href = 'index.html';
-          } else {
-              alert('验证受阻：' + data.msg);
-          }
-      })
+      .then(data => handleLoginResponse(data))
       .catch(err => {
           console.error("网络异常", err);
           alert('通讯中断，请检查后端服务是否启动！');
       });
+  }
+
+  // --- 业务逻辑 2：发送验证码 ---
+  function sendCode() {
+      const email = document.getElementById('email').value;
+      if(!email || !email.includes('@')) {
+          alert('请先输入有效的邮箱地址！');
+          return;
+      }
+
+      const btn = document.getElementById('btnSendCode');
+      btn.disabled = true;
+
+      fetch(`/user/code?email=${encodeURIComponent(email)}`, {
+          method: 'POST'
+      })
+      .then(res => res.json())
+      .then(data => {
+          if(data.code === 200) {
+              startCountdown(btn, 60);
+              alert('暗号已发送，请查收邮箱！(测试阶段请查看控制台)');
+          } else {
+              alert('发送受阻：' + data.msg);
+              btn.disabled = false;
+          }
+      })
+      .catch(err => {
+          console.error(err);
+          btn.disabled = false;
+          alert('通讯中断！');
+      });
+  }
+
+  // --- 业务逻辑 3：邮箱登录 ---
+  function doEmailLogin() {
+      const email = document.getElementById('email').value;
+      const code = document.getElementById('code').value;
+
+      if(!email || !code) {
+          alert('邮箱和验证码均不可为空！');
+          return;
+      }
+
+      fetch(`/user/login/email?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`, {
+          method: 'POST'
+      })
+      .then(res => res.json())
+      .then(data => handleLoginResponse(data))
+      .catch(err => {
+          console.error(err);
+          alert('通讯中断！');
+      });
+  }
+
+  // --- 🚨 辅助工具：处理登录成功逻辑 ---
+  function handleLoginResponse(data) {
+      if(data.code === 200) {
+          localStorage.setItem('token', data.data);
+          alert('身份核实完毕，即将转入主页面！');
+          window.location.href = 'index.html';
+      } else {
+          alert('验证受阻：' + data.msg);
+      }
+  }
+
+  // --- 辅助工具：60秒倒计时 ---
+  function startCountdown(btn, seconds) {
+      let timeLeft = seconds;
+      btn.innerText = `${timeLeft}s 后重试`;
+
+      const timer = setInterval(() => {
+          timeLeft--;
+          if(timeLeft <= 0) {
+              clearInterval(timer);
+              btn.innerText = '获取暗号';
+              btn.disabled = false;
+          } else {
+              btn.innerText = `${timeLeft}s 后重试`;
+          }
+      }, 1000);
   }
 </script>
 </body>
